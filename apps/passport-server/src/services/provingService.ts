@@ -20,6 +20,9 @@ import path from "path";
 import { PCDHTTPError } from "../routing/pcdHttpError";
 import { logger } from "../util/logger";
 import { RollbarService } from "./rollbarService";
+import { EzklSecretPCDPackage } from "@pcd/ezkl-secret-pcd";
+import { EzklGroupPCDPackage } from "@pcd/ezkl-group-pcd";
+import { EzklDisplayPCDPackage } from "@pcd/ezkl-display-pcd";
 
 /**
  * Responsible for server-side proving that can optionally be used by clients.
@@ -54,7 +57,10 @@ export class ProvingService {
     EdDSAPCDPackage,
     EdDSATicketPCDPackage,
     RSAImagePCDPackage,
-    ZKEdDSAEventTicketPCDPackage
+    ZKEdDSAEventTicketPCDPackage,
+    EzklSecretPCDPackage,
+    EzklGroupPCDPackage,
+    EzklDisplayPCDPackage
   ];
 
   public constructor(rollbarService: RollbarService | null) {
