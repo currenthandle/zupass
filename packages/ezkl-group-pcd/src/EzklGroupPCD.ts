@@ -9,8 +9,8 @@ import JSONBig from "json-bigint";
 import { v4 as uuid } from "uuid";
 import { gzip } from "pako";
 
-import { EzklSecretPCD, EzklSecretPCDPackage } from "@pcd/ezkl-secret-pcd";
-import { EzklDisplayPCD, EzklDisplayPCDPackage } from "@pcd/ezkl-display-pcd";
+// import { type EzklSecretPCD } from "@pcd/ezkl-secret-pcd";
+// import { type EzklDisplayPCD } from "@pcd/ezkl-display-pcd";
 
 async function getVerify() {
   try {
@@ -99,7 +99,8 @@ export const EzklGroupPCDTypeName = "ezkl-group-pcd";
 // }
 
 export interface EzklGroupPCDArgs {
-  displayPCD: PCDArgument<EzklDisplayPCD>;
+  // displayPCD: PCDArgument<EzklDisplayPCD>;
+  displayPCD: PCDArgument<any>;
 }
 
 export interface EzklGroupPCDClaim {
@@ -135,9 +136,11 @@ export async function prove(args: EzklGroupPCDArgs): Promise<EzklGroupPCD> {
   if (!args.displayPCD.value) {
     throw new Error("Cannot make group proof: missing secret pcd");
   }
-  const displayPCD = await EzklDisplayPCDPackage.deserialize(
-    args.displayPCD.value.pcd
-  );
+  // note: this causes circular dependency
+  // const displayPCD = await EzklDisplayPCDPackage.deserialize(
+  //   args.displayPCD.value.pcd
+  // );
+  const displayPCD = JSONBig().parse(args.displayPCD.value.pcd);
   const { secretPCD } = displayPCD.proof;
 
   const genWitness = await getGenWitness();
@@ -291,15 +294,18 @@ export async function verify(pcd: EzklGroupPCD): Promise<boolean> {
 }
 
 export async function serialize(
-  pcd: EzklSecretPCD
-): Promise<SerializedPCD<EzklSecretPCD>> {
+  // pcd: EzklSecretPCD
+  pcd: any
+  // ): Promise<SerializedPCD<EzklSecretPCD>> {
+): Promise<SerializedPCD<any>> {
   return {
     type: EzklGroupPCDTypeName,
     pcd: JSONBig().stringify(pcd)
-  } as SerializedPCD<EzklSecretPCD>;
+  } as SerializedPCD<any>;
 }
 
-export async function deserialize(serialized: string): Promise<EzklSecretPCD> {
+// export async function deserialize(serialized: string): Promise<EzklSecretPCD> {
+export async function deserialize(serialized: string): Promise<any> {
   return JSONBig().parse(serialized);
 }
 
