@@ -47,6 +47,16 @@ async function getInit() {
   }
 }
 
+async function getInitPanicHook() {
+  try {
+    const module = await import("@ezkljs/engine/web/ezkl");
+    const init = module.init_panic_hook;
+    return init;
+  } catch (err) {
+    console.error("Failed to import module:", err);
+  }
+}
+
 async function getProve() {
   try {
     const module = await import("@ezkljs/engine/web/ezkl");
@@ -153,6 +163,12 @@ export async function prove(args: EzklGroupPCDArgs): Promise<EzklGroupPCD> {
     "http://localhost:3000/ezkl-artifacts/ezkl_bg.wasm",
     new WebAssembly.Memory({ initial: 20, maximum: 1024, shared: true })
   );
+
+  const initPanicHook = await getInitPanicHook();
+  if (!initPanicHook) {
+    throw new Error("Failed to import module initPanicHook");
+  }
+  await initPanicHook();
 
   if (!genWitness) {
     throw new Error("Failed to import module genWitness");
@@ -262,8 +278,70 @@ export async function prove(args: EzklGroupPCDArgs): Promise<EzklGroupPCD> {
   const vkBuf = await vkResp.arrayBuffer();
   const vk = new Uint8ClampedArray(vkBuf);
 
-  const verified = await verify(proof, vk, settings, srs);
+  console.log("proof", proof);
+  // proof = {z, proof_raw}
+  // for (let i = 0; i < 32; i++) {
+  //   proof[i] = 0;
+  // }
+  // proof[] = 0;
+  console.log("proof", proof);
+
+  console.log("before verify");
+
+  console.log("after verify");
+
+  console.log(
+    "==========================================================================="
+  );
+  console.log(
+    "==========================================================================="
+  );
+  console.log(
+    "==========================================================================="
+  );
+  console.log(
+    "==========================================================================="
+  );
+  // console.log("PROOF", JSONBig.stringify(proof));
+  // set first 32 bytes to 0
+  let stringTemp = new TextDecoder().decode(new Uint8Array(proof.buffer));
+  let jsonObject = JSONBig.parse(stringTemp);
+
+  console.log("PROOF", jsonObject);
+  jsonObject.instances[0] = Array(4).fill(0);
+  // jsonObject.instances[0][0] = 0;
+  // jsonObject.instances[0][1] = 0;
+  // jsonObject.instances[0][2] = 0;
+  // jsonObject.instances[0][3] = 0;
+  //[
+  //   [0, 0, 0, 0],
+  //]
+
+  // Step 1: Stringify the Object with BigInt support
+  const jsonString = JSONBig.stringify(jsonObject);
+
+  // Step 2: Encode the JSON String
+  const uint8Array = new TextEncoder().encode(jsonString);
+
+  // Step 3: Convert to Uint8ClampedArray
+  const processedProof = new Uint8ClampedArray(uint8Array.buffer);
+
+  const verified = await verify(processedProof, vk, settings, srs);
+  console.log("PROOF", processedProof);
+
   console.log("VERIFIED", verified);
+  console.log(
+    "==========================================================================="
+  );
+  console.log(
+    "==========================================================================="
+  );
+  console.log(
+    "==========================================================================="
+  );
+  console.log(
+    "==========================================================================="
+  );
 
   return new EzklGroupPCD(
     uuid(),
