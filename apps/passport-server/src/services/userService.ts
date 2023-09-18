@@ -209,9 +209,8 @@ export class UserService {
       `[ZUID] send-login-email ${JSON.stringify({ email, commitment, force })}`
     );
 
-    const devBypassEmail =
-      process.env.BYPASS_EMAIL_REGISTRATION === "true" &&
-      process.env.NODE_ENV !== "production";
+    const devBypassEmail = process.env.BYPASS_EMAIL_REGISTRATION === "true";
+    //  && process.env.NODE_ENV !== "production";
 
     if (!validateEmail(email)) {
       const errMsg = `'${email}' is not a valid email`;
