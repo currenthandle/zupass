@@ -151,7 +151,8 @@ export async function prove(args: EzklGroupPCDArgs): Promise<EzklGroupPCD> {
   }
   await init(
     // "http://localhost:3000/ezkl-artifacts/ezkl_bg.wasm",
-    "https://passport-client-3km0.onrender.com/ezkl-artifacts/ezkl_bg.wasm",
+    // "https://passport-client-3km0.onrender.com/ezkl-artifacts/ezkl_bg.wasm",
+    "/ezkl-artifacts/ezkl_bg.wasm",
     new WebAssembly.Memory({ initial: 20, maximum: 1024, shared: true })
   );
 
