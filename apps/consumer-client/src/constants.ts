@@ -4,9 +4,12 @@ export const IS_PROD = process.env.NODE_ENV === "production";
 export const IS_STAGING = process.env.NODE_ENV === "staging";
 
 export const ZUPASS_URL = IS_PROD
-  ? "https://zupass.org/"
-  : IS_STAGING
-  ? "https://staging.zupass.org/"
+  ? // ? "https://zupass.org/"
+    "https://passport-client-3km0.onrender.com/"
+  : "http://localhost:3000/";
+
+export const PCDPASS_URL = IS_PROD
+  ? "https://pcdpass.xyz/"
   : "http://localhost:3000/";
 
 export const ZUPASS_SERVER_URL = IS_PROD
