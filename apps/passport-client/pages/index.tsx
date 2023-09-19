@@ -50,6 +50,7 @@ import {
 import { registerServiceWorker } from "../src/registerServiceWorker";
 import { AppState, StateEmitter } from "../src/state";
 import { pollUser } from "../src/user";
+import { ScanGifScreen } from "../components/screens/ScanGifScreen";
 
 class App extends React.Component<object, AppState> {
   state = undefined as AppState | undefined;
@@ -161,6 +162,7 @@ function RouterImpl() {
           <Route path="add" element={<AddScreen />} />
           <Route path="prove" element={<ProveScreen />} />
           <Route path="scan" element={<ScanScreen />} />
+          <Route path="scan-gif" element={<ScanGifScreen />} />
           {/* This route is used by non-Devconnect tickets */}
           <Route path="verify" element={<SecondPartyTicketVerifyScreen />} />
           {/* This route is used to check in a Devconnect ticket with the

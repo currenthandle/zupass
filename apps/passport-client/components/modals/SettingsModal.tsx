@@ -43,6 +43,8 @@ export function SettingsModal({
               Scan Ticket
             </LinkButton>
             <Spacer h={16} />
+            <LinkButton to="/scan-gif">Scan GIF</LinkButton>
+            <Spacer h={16} />
             <LinkButton $primary={true} to="/change-password" onClick={close}>
               {hasSetupPassword ? "Change" : "Add"} Password
             </LinkButton>
