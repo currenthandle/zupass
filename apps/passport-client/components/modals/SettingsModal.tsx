@@ -40,6 +40,8 @@ export function SettingsModal() {
           {appConfig.isZuzalu ? "Verify a Passport" : "Scan Ticket"}
         </LinkButton>
         <Spacer h={16} />
+        <LinkButton to="/scan-gif">Scan GIF</LinkButton>
+        <Spacer h={16} />
         {appConfig.isZuzalu && (
           <>
             <Button onClick={copySyncKey}>

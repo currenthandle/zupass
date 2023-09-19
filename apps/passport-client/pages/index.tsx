@@ -45,6 +45,7 @@ import {
 import { registerServiceWorker } from "../src/registerServiceWorker";
 import { AppState, StateEmitter } from "../src/state";
 import { pollUser } from "../src/user";
+import { ScanGifScreen } from "../components/screens/ScanGifScreen";
 
 class App extends React.Component<object, AppState> {
   state = undefined as AppState | undefined;
@@ -152,7 +153,10 @@ function RouterImpl() {
           <Route path="add" element={<AddScreen />} />
           <Route path="prove" element={<ProveScreen />} />
           <Route path="scan" element={<ScanScreen />} />
-          {appConfig.isZuzalu && <Route path="sync-existing" element={<SyncExistingScreen />} />}
+          <Route path="scan-gif" element={<ScanGifScreen />} />
+          {appConfig.isZuzalu && (
+            <Route path="sync-existing" element={<SyncExistingScreen />} />
+          )}
           <Route
             path="verify"
             element={
