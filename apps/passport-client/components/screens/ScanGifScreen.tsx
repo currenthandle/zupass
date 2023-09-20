@@ -35,6 +35,14 @@ export function ScanGifScreen() {
   }, [numFrames, scans]);
   return (
     <AppContainer bg="gray">
+      <div>
+        {scans.map((scan, i) => {
+          if (scan?.length > 0) {
+            return `${i},`;
+          }
+          return `*,`;
+        })}
+      </div>
       {!scanned ? (
         <>
           <QrReader
