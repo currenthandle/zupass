@@ -18,7 +18,7 @@ export function ScanGifScreen() {
   // const [socket, setSocket] = useState(null);
   const socketRef = useRef(null);
 
-  const timer = useRef<NodeJS.Timeout | null>(null);
+  // const timer = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     // socketRef.current = io("http://192.168.5.120:3002/gifscan");

@@ -26,6 +26,8 @@ export function initGifScanRoutes(
 
     socket.on("qrId", (id) => {
       logger("[SOCKET] id received", id);
+
+      socket.broadcast.emit("broadcastedQrId", id);
     });
     socket.on("disconnect", () => {
       logger("[SOCKET] user disconnected");
