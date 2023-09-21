@@ -10,6 +10,7 @@ import { tracingMiddleware } from "./middlewares/tracingMiddleware";
 import { initE2EERoutes } from "./routes/e2eeRoutes";
 import { initHealthcheckRoutes } from "./routes/healthCheckRoutes";
 import { initLogRoutes } from "./routes/logRoutes";
+import { initGifScanRoutes } from "./routes/gifScanRoutes";
 import { initPCDIssuanceRoutes } from "./routes/pcdIssuanceRoutes";
 import { initPCDpassRoutes } from "./routes/pcdpassRoutes";
 import { initProvingRoutes } from "./routes/provingRoutes";
@@ -91,4 +92,5 @@ function initAllRoutes(
   initPCDIssuanceRoutes(app, context, globalServices);
   initTelegramRoutes(app, context, globalServices);
   initLogRoutes(app);
+  initGifScanRoutes(app);
 }

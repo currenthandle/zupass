@@ -15,15 +15,22 @@ export function ScanGifScreen() {
   const [scanned, setScanned] = useState(false);
   const [numFrames, setNumFrames] = useState(0);
 
-  console.log(scans);
+  // console.log(scans);
+  useEffect(() => {
+    (async () => {
+      const resp = await fetch("http://localhost:3002/gifscan");
+      const message = await resp.text();
+      console.log("message", message);
+    })();
+  }, []);
 
   useEffect(() => {
-    console.log("numFrames > 0", numFrames > 0);
-    console.log("numFrames === scans.length", numFrames === scans.length);
-    console.log(
-      "scans.every((scan) => scan && scan.length > 0)",
-      scans.every((scan) => scan && scan.length > 0)
-    );
+    // console.log("numFrames > 0", numFrames > 0);
+    // console.log("numFrames === scans.length", numFrames === scans.length);
+    // console.log(
+    //   "scans.every((scan) => scan && scan.length > 0)",
+    //   scans.every((scan) => scan && scan.length > 0)
+    // );
     if (numFrames > 0 && numFrames === scans.length) {
       for (let i = 0; i < numFrames; i++) {
         if (!scans[i]) {
@@ -48,25 +55,33 @@ export function ScanGifScreen() {
           <QrReader
             onResult={(result, error) => {
               // console.log("result");
+              if (error) {
+                // console.error("error", error);
+                return;
+              }
               if (!result) {
                 return;
               }
+
               const data = result.getText();
               const id = parseInt(data.substring(0, 2), 10);
               const length = parseInt(data.substring(2, 4), 10);
               const chunkData = data.substring(4);
 
               if (numFrames === 0) {
-                console.log("setNumFrames", length);
+                // console.log("setNumFrames", length);
                 setNumFrames(length);
               }
 
               if (!scans[id]) {
-                console.log("");
-                console.log("scans[id]", scans[id]);
-                console.log("setScans", id);
+                // console.log("");
+                // console.log("scans[id]", scans[id]);
+                // console.log("setScans", id);
+                const newScans = [...scans];
+                newScans[id] = chunkData;
+                // console.log("newScans", newScans);
+                // setScans(newScans);
                 setScans((prevScans) => {
-                  // console.log(prevScans);
                   const newScans = [...prevScans];
                   newScans[id] = chunkData;
 
