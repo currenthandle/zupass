@@ -1,7 +1,7 @@
 import QRCode from "react-qr-code";
 import { useEffect, useRef, useState } from "react";
 import JSONbig from "json-bigint";
-// import { Socket } from "socket.io-client";
+import { Socket } from "socket.io-client";
 import io from "socket.io-client";
 import "setimmediate";
 
@@ -20,7 +20,7 @@ const chunkSize = 480; // The max length for each chunk
 // }
 
 export default function GifQR({ proof }: { proof: string }) {
-  const socketRef = useRef<any>(null);
+  const socketRef = useRef<Socket | null>(null);
   useEffect(() => {
     // socketRef.current = io("http://192.168.5.120:3002/gifscan");
     // socketRef.current = io("http://192.168.5.120:3002", {
@@ -45,7 +45,9 @@ export default function GifQR({ proof }: { proof: string }) {
 
     // Clean up on component unmount
     return () => {
-      socketRef.current.disconnect();
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+      }
     };
   }, []);
 
