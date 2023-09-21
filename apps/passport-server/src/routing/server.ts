@@ -47,7 +47,9 @@ export async function startServer(
         })
       );
 
-      initAllRoutes(app, context, globalServices);
+      const server = http.createServer(app);
+
+      initAllRoutes(app, context, globalServices, server);
 
       app.use(
         (
@@ -63,7 +65,7 @@ export async function startServer(
         }
       );
 
-      const server = app.listen(port, () => {
+      server.listen(port, () => {
         logger(`[INIT] HTTP server listening on port ${port}`);
         sendEvent(context, EventName.SERVER_START);
         resolve({ server, app });
@@ -79,7 +81,8 @@ export async function startServer(
 function initAllRoutes(
   app: express.Application,
   context: ApplicationContext,
-  globalServices: GlobalServices
+  globalServices: GlobalServices,
+  server: http.Server
 ): void {
   initStatusRoutes(app, context, globalServices);
   initHealthcheckRoutes(app, context);
@@ -92,5 +95,5 @@ function initAllRoutes(
   initPCDIssuanceRoutes(app, context, globalServices);
   initTelegramRoutes(app, context, globalServices);
   initLogRoutes(app);
-  initGifScanRoutes(app);
+  initGifScanRoutes(app, server);
 }
