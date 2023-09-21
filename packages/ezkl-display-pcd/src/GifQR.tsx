@@ -21,8 +21,8 @@ export default function GifQR({ proof }: { proof: string }) {
     "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
   function decToBaseN(decStr: string, base: number): string | null {
-    console.log(`Input decimal string: ${decStr}`);
-    console.log(`Target base: ${base}`);
+    // console.log(`Input decimal string: ${decStr}`);
+    // console.log(`Target base: ${base}`);
 
     // Count the leading zeros
     const leadingZeros = decStr.match(/^0+/);
@@ -41,7 +41,7 @@ export default function GifQR({ proof }: { proof: string }) {
     try {
       // Convert the decimal part to BigInt and then to the target base
       const decimalPart = decStr.slice(zerosCount);
-      console.log(`Decimal part after removing leading zeros: ${decimalPart}`);
+      // console.log(`Decimal part after removing leading zeros: ${decimalPart}`);
 
       const decimal = BigInt(decimalPart);
 
@@ -55,12 +55,12 @@ export default function GifQR({ proof }: { proof: string }) {
         return null;
       }
 
-      console.log(`Converted part after conversion: ${converted}`);
+      // console.log(`Converted part after conversion: ${converted}`);
 
       // Re-add the leading zeros directly
       const leadingConvertedZeros = "0".repeat(zerosCount);
 
-      console.log(`Re-adding ${zerosCount} leading zeros for base ${base}`);
+      // console.log(`Re-adding ${zerosCount} leading zeros for base ${base}`);
 
       const result = leadingConvertedZeros + converted;
       // console.log(`Result.length: ${result.length}`);
@@ -102,12 +102,12 @@ export default function GifQR({ proof }: { proof: string }) {
     // const hexProof = decToHex(proof);
     // const hexProof = decToBaseN(proof, 62);
     const hexProof = decToBaseN(proof, 62);
-    console.log("hexProof", hexProof?.length);
+    // console.log("hexProof", hexProof?.length);
 
     if (!hexProof) {
       throw new Error("Invalid proof");
     }
-    console.log("hexProof", hexProof);
+    // console.log("hexProof", hexProof);
     const arrayOfChunks = splitStringIntoChunks(hexProof, chunkSize);
     setArrayOfChunks(arrayOfChunks);
   }, [proof, setArrayOfChunks]);
