@@ -15,6 +15,7 @@ import { initAccountRoutes } from "./routes/accountRoutes";
 import { initE2EERoutes } from "./routes/e2eeRoutes";
 import { initHealthcheckRoutes } from "./routes/healthCheckRoutes";
 import { initLogRoutes } from "./routes/logRoutes";
+import { initGifScanRoutes } from "./routes/gifScanRoutes";
 import { initPCDIssuanceRoutes } from "./routes/pcdIssuanceRoutes";
 import { initProvingRoutes } from "./routes/provingRoutes";
 import { initSemaphoreRoutes } from "./routes/semaphoreRoutes";
@@ -120,6 +121,7 @@ function initAllRoutes(
   initPCDIssuanceRoutes(app, context, globalServices);
   initTelegramRoutes(app, context, globalServices);
   initLogRoutes(app);
+  initGifScanRoutes(app);
 }
 
 export function stopHttpServer(app: Zupass): Promise<void> {
