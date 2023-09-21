@@ -37,6 +37,7 @@
     "@types/react": "^18.0.22",
     "react-qr-code": "^2.0.12",
     "react-spinners": "^0.13.8",
+    "setimmediate": "^1.0.5",
     "socket.io": "^4.7.2",
     "socket.io-client": "^4.7.2",
     "turbo": "^1.8.5"
