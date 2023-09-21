@@ -43,19 +43,6 @@ export function ScanGifScreen() {
       socketRef.current.disconnect();
     };
   }, []);
-  // console.log(scans);
-
-  // useEffect(() => {
-  //   timer.current = setInterval(() => {
-  //     (async () => {
-  //       // const resp = await fetch("http://localhost:3002/gifscan");
-  //       const resp = await fetch("http://192.168.5.120:3002/gifscan");
-  //       const message = await resp.text();
-  //       console.log("message", message);
-  //     })();
-  //   }, 1000);
-  //   return () => clearInterval(timer.current as any);
-  // }, []);
 
   useEffect(() => {
     // console.log("numFrames > 0", numFrames > 0);
@@ -75,16 +62,16 @@ export function ScanGifScreen() {
   }, [numFrames, scans]);
   return (
     <AppContainer bg="gray">
-      <div>
-        {scans.map((scan, i) => {
-          if (scan?.length > 0) {
-            return `${i},`;
-          }
-          return `*,`;
-        })}
-      </div>
       {!scanned ? (
         <>
+          <div>
+            {scans.map((scan, i) => {
+              if (scan?.length > 0) {
+                return `${i},`;
+              }
+              return `*,`;
+            })}
+          </div>
           <QrReader
             onResult={(result, error) => {
               // console.log("result");
@@ -123,36 +110,6 @@ export function ScanGifScreen() {
                   return newScans;
                 });
               }
-
-              // if (result != null) {
-              //   const data = result.getText();
-              //   const id = parseInt(data.substring(0, 2), 10);
-              //   const length = parseInt(data.substring(2, 4), 10);
-              //   const chunkData = data.substring(4);
-
-              //   setScans((prevScans) => {
-              //     const newScans = [...prevScans];
-              //     newScans[id] = chunkData;
-
-              //     const logScans = newScans.map((scan, i) => {
-              //       return scan ? `${i.toString()}, ` : "*, ";
-              //     });
-              //     console.log(`Scans: ${logScans}`);
-
-              //     if (
-              //       length === newScans.length &&
-              //       newScans.every((scan) => scan && scan.length > 0)
-              //     ) {
-              //       // Schedule setScanned to run after the current render/update cycle.
-              //       setTimeout(() => setScanned(true), 0);
-              //     }
-
-              //     return newScans;
-              //   });
-              // } else if (error != null) {
-              //   // handle the error
-              //   // console.error(`Error scanning QR code: ${error}`);
-              // }
             }}
             constraints={{ facingMode: "environment", aspectRatio: 1 }}
             ViewFinder={ViewFinder}
@@ -164,10 +121,7 @@ export function ScanGifScreen() {
       ) : (
         <div>
           {scans.map((scan, i) => {
-            if (scan?.length > 0) {
-              return `${i},`;
-            }
-            return `*,`;
+            return <div key={i}>{scan}</div>;
           })}
         </div>
       )}
