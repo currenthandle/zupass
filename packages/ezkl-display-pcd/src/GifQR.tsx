@@ -2,9 +2,24 @@ import QRCode from "react-qr-code";
 import { useEffect, useRef, useState } from "react";
 import JSONbig from "json-bigint";
 
-const chunkSize = 300; // The max length for each chunk
+const chunkSize = 480; // The max length for each chunk
+
+// const BASE62 = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+// function toBase62(num: number) {
+//   if (num === 0) return BASE62[0];
+//   let s = "";
+//   while (num > 0) {
+//     s = BASE62[num % 62] + s;
+//     num = Math.floor(num / 62);
+//   }
+//   return s;
+// }
 
 export default function GifQR({ proof }: { proof: string }) {
+  const BASE62 =
+    "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
   function decToBaseN(decStr: string, base: number): string | null {
     console.log(`Input decimal string: ${decStr}`);
     console.log(`Target base: ${base}`);
@@ -29,7 +44,16 @@ export default function GifQR({ proof }: { proof: string }) {
       console.log(`Decimal part after removing leading zeros: ${decimalPart}`);
 
       const decimal = BigInt(decimalPart);
-      const converted = decimal.toString(base);
+
+      let converted = "";
+      if (base <= 36) {
+        converted = decimal.toString(base);
+      } else if (base === 62) {
+        converted = toBase62(decimal);
+      } else {
+        console.log(`Unsupported base: ${base}`);
+        return null;
+      }
 
       console.log(`Converted part after conversion: ${converted}`);
 
@@ -45,6 +69,16 @@ export default function GifQR({ proof }: { proof: string }) {
       console.error("Error converting to BigInt:", e);
       return null;
     }
+  }
+
+  function toBase62(num: bigint): string {
+    if (num === 0n) return BASE62[0];
+    let s = "";
+    while (num > 0n) {
+      s = BASE62[Number(num % 62n)] + s;
+      num = num / 62n;
+    }
+    return s;
   }
 
   function splitStringIntoChunks(str: string, chunkSize: number) {
@@ -66,7 +100,8 @@ export default function GifQR({ proof }: { proof: string }) {
 
   useEffect(() => {
     // const hexProof = decToHex(proof);
-    const hexProof = decToBaseN(proof, 36);
+    // const hexProof = decToBaseN(proof, 62);
+    const hexProof = decToBaseN(proof, 62);
     console.log("hexProof", hexProof?.length);
 
     if (!hexProof) {
@@ -81,14 +116,14 @@ export default function GifQR({ proof }: { proof: string }) {
     tick.current = setInterval(() => {
       // console.log('tick')
 
-      console.log("currentQRCode", currentQRCode);
-      console.log("arrayOfChunks.length", arrayOfChunks.length);
+      // console.log("currentQRCode", currentQRCode);
+      // console.log("arrayOfChunks.length", arrayOfChunks.length);
       if (currentQRCode === arrayOfChunks.length - 1) {
         setCurrentQRCode(0);
       } else {
         setCurrentQRCode(currentQRCode + 1);
       }
-    }, 150);
+    }, 800);
     return () => clearInterval(tick.current as any);
   }, [setCurrentQRCode, currentQRCode, arrayOfChunks]);
 
@@ -117,7 +152,13 @@ export default function GifQR({ proof }: { proof: string }) {
         key={i}
         level="L"
         size={256}
-        style={{ height: "auto", maxWidth: "100%", width: "100%" }}
+        style={{
+          height: "auto",
+          maxWidth: "100%",
+          width: "100%",
+          paddingLeft: "15px",
+          paddingRight: "15px"
+        }}
         value={id + numChunks + chunk}
         viewBox={`0 0 256 256`}
       />
