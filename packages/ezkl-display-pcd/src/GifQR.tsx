@@ -21,6 +21,7 @@ const chunkSize = 480; // The max length for each chunk
 
 export default function GifQR({ proof }: { proof: string }) {
   const socketRef = useRef<Socket | null>(null);
+  const [skipChunks, setSkipChunks] = useState<Record<number, true>>({});
   useEffect(() => {
     // socketRef.current = io("http://192.168.5.120:3002/gifscan");
     // socketRef.current = io("http://192.168.5.120:3002", {
@@ -33,6 +34,7 @@ export default function GifQR({ proof }: { proof: string }) {
 
     socketRef.current.on("broadcastedQrId", (id) => {
       console.log("broadcastedQrId", id);
+      setSkipChunks((prev) => ({ ...prev, [id]: true }));
     });
 
     socketRef.current.on("connect_error", (error) => {
@@ -152,12 +154,18 @@ export default function GifQR({ proof }: { proof: string }) {
 
       // console.log("currentQRCode", currentQRCode);
       // console.log("arrayOfChunks.length", arrayOfChunks.length);
-      if (currentQRCode === arrayOfChunks.length - 1) {
-        setCurrentQRCode(0);
-      } else {
-        setCurrentQRCode(currentQRCode + 1);
+      let nextIndex = currentQRCode + 1;
+      if (nextIndex === arrayOfChunks.length) {
+        nextIndex = 0;
       }
-    }, 800);
+      while (skipChunks[nextIndex]) {
+        nextIndex++;
+        if (nextIndex === arrayOfChunks.length) {
+          nextIndex = 0;
+        }
+      }
+      setCurrentQRCode(nextIndex);
+    }, 400);
     return () => clearInterval(tick.current as any);
   }, [setCurrentQRCode, currentQRCode, arrayOfChunks]);
 
