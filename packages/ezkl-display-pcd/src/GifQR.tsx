@@ -1,6 +1,9 @@
 import QRCode from "react-qr-code";
 import { useEffect, useRef, useState } from "react";
 import JSONbig from "json-bigint";
+// import { Socket } from "socket.io-client";
+import io from "socket.io-client";
+import "setimmediate";
 
 const chunkSize = 480; // The max length for each chunk
 
@@ -17,6 +20,35 @@ const chunkSize = 480; // The max length for each chunk
 // }
 
 export default function GifQR({ proof }: { proof: string }) {
+  const socketRef = useRef<any>(null);
+  useEffect(() => {
+    // socketRef.current = io("http://192.168.5.120:3002/gifscan");
+    // socketRef.current = io("http://192.168.5.120:3002", {
+    // socketRef.current = io("http://192.168.5.120:3002/gifscan");
+    socketRef.current = io("http://localhost:3002/gifscan");
+
+    socketRef.current.on("connect", () => {
+      console.log("[SOCKET] Connected to server");
+    });
+
+    socketRef.current.on("broadcastedQrId", (id) => {
+      console.log("broadcastedQrId", id);
+    });
+
+    socketRef.current.on("connect_error", (error) => {
+      console.error("[SOCKET] Connection error:", error);
+    });
+
+    socketRef.current.on("disconnect", (reason) => {
+      console.log("[SOCKET] Disconnected from server. Reason:", reason);
+    });
+
+    // Clean up on component unmount
+    return () => {
+      socketRef.current.disconnect();
+    };
+  }, []);
+
   const BASE62 =
     "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
