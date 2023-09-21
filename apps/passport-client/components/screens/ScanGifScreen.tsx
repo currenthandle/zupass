@@ -6,7 +6,8 @@ import { Spacer, TextCenter } from "../core";
 import { CircleButton } from "../core/Button";
 import { icons } from "../icons";
 import { AppContainer } from "../shared/AppContainer";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import io from "socket.io-client";
 
 // Scan a PCD QR code, then go to /verify to verify and display the proof.
 export function ScanGifScreen() {
@@ -14,15 +15,47 @@ export function ScanGifScreen() {
   const [scans, setScans] = useState<string[]>([]);
   const [scanned, setScanned] = useState(false);
   const [numFrames, setNumFrames] = useState(0);
+  // const [socket, setSocket] = useState(null);
+  const socketRef = useRef(null);
 
-  // console.log(scans);
+  const timer = useRef<NodeJS.Timeout | null>(null);
+
   useEffect(() => {
-    (async () => {
-      const resp = await fetch("http://localhost:3002/gifscan");
-      const message = await resp.text();
-      console.log("message", message);
-    })();
+    // socketRef.current = io("http://192.168.5.120:3002/gifscan");
+    // socketRef.current = io("http://192.168.5.120:3002", {
+    // socketRef.current = io("http://192.168.5.120:3002/gifscan");
+    socketRef.current = io("http://localhost:3002/gifscan");
+
+    socketRef.current.on("connect", () => {
+      console.log("[SOCKET] Connected to server");
+    });
+
+    socketRef.current.on("connect_error", (error) => {
+      console.error("[SOCKET] Connection error:", error);
+    });
+
+    socketRef.current.on("disconnect", (reason) => {
+      console.log("[SOCKET] Disconnected from server. Reason:", reason);
+    });
+
+    // Clean up on component unmount
+    return () => {
+      socketRef.current.disconnect();
+    };
   }, []);
+  // console.log(scans);
+
+  // useEffect(() => {
+  //   timer.current = setInterval(() => {
+  //     (async () => {
+  //       // const resp = await fetch("http://localhost:3002/gifscan");
+  //       const resp = await fetch("http://192.168.5.120:3002/gifscan");
+  //       const message = await resp.text();
+  //       console.log("message", message);
+  //     })();
+  //   }, 1000);
+  //   return () => clearInterval(timer.current as any);
+  // }, []);
 
   useEffect(() => {
     // console.log("numFrames > 0", numFrames > 0);
@@ -67,6 +100,8 @@ export function ScanGifScreen() {
               const id = parseInt(data.substring(0, 2), 10);
               const length = parseInt(data.substring(2, 4), 10);
               const chunkData = data.substring(4);
+
+              socketRef.current.emit("qrId", id);
 
               if (numFrames === 0) {
                 // console.log("setNumFrames", length);

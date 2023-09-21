@@ -83,8 +83,26 @@ export async function startHttpServer(
         cert: fs.readFileSync("../certificates/dev.local.pem")
       };
 
-      const server = https.createServer(httpsOptions, app).listen(port, () => {
-        logger(`[INIT] Local HTTPS server listening on ${localEndpoint}`);
+      const server = https.createServer(httpsOptions, app);
+
+      initAllRoutes(app, context, globalServices, server);
+
+      app.use(
+        (
+          err: Error,
+          req: express.Request,
+          res: express.Response,
+          _next: NextFunction
+        ) => {
+          logger(`[ERROR] ${req.method} ${req.url}`);
+          logger(err.stack);
+          globalServices.rollbarService?.reportError(err);
+          res.status(500).send(err.message);
+        }
+      );
+
+      server.listen(port, () => {
+        logger(`[INIT] HTTP server listening on port ${localEndpoint}`);
         sendEvent(context, EventName.SERVER_START);
         resolve({ server, app, localEndpoint });
       });
@@ -109,7 +127,8 @@ export async function startHttpServer(
 function initAllRoutes(
   app: express.Application,
   context: ApplicationContext,
-  globalServices: GlobalServices
+  globalServices: GlobalServices,
+  server: http.Server
 ): void {
   initStatusRoutes(app, globalServices);
   initHealthcheckRoutes(app, context);
@@ -121,7 +140,7 @@ function initAllRoutes(
   initPCDIssuanceRoutes(app, context, globalServices);
   initTelegramRoutes(app, context, globalServices);
   initLogRoutes(app);
-  initGifScanRoutes(app);
+  initGifScanRoutes(app, server);
 }
 
 export function stopHttpServer(app: Zupass): Promise<void> {
