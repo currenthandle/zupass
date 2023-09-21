@@ -7,18 +7,6 @@ import "setimmediate";
 
 const chunkSize = 480; // The max length for each chunk
 
-// const BASE62 = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-
-// function toBase62(num: number) {
-//   if (num === 0) return BASE62[0];
-//   let s = "";
-//   while (num > 0) {
-//     s = BASE62[num % 62] + s;
-//     num = Math.floor(num / 62);
-//   }
-//   return s;
-// }
-
 export default function GifQR({ proof }: { proof: string }) {
   const socketRef = useRef<Socket | null>(null);
   const [skipChunks, setSkipChunks] = useState<Record<number, true>>({});
@@ -57,9 +45,6 @@ export default function GifQR({ proof }: { proof: string }) {
     "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
   function decToBaseN(decStr: string, base: number): string | null {
-    // console.log(`Input decimal string: ${decStr}`);
-    // console.log(`Target base: ${base}`);
-
     // Count the leading zeros
     const leadingZeros = decStr.match(/^0+/);
     let zerosCount = 0;
@@ -75,9 +60,7 @@ export default function GifQR({ proof }: { proof: string }) {
     }
 
     try {
-      // Convert the decimal part to BigInt and then to the target base
       const decimalPart = decStr.slice(zerosCount);
-      // console.log(`Decimal part after removing leading zeros: ${decimalPart}`);
 
       const decimal = BigInt(decimalPart);
 
@@ -90,16 +73,9 @@ export default function GifQR({ proof }: { proof: string }) {
         console.log(`Unsupported base: ${base}`);
         return null;
       }
-
-      // console.log(`Converted part after conversion: ${converted}`);
-
-      // Re-add the leading zeros directly
       const leadingConvertedZeros = "0".repeat(zerosCount);
 
-      // console.log(`Re-adding ${zerosCount} leading zeros for base ${base}`);
-
       const result = leadingConvertedZeros + converted;
-      // console.log(`Result.length: ${result.length}`);
       return result;
     } catch (e) {
       console.error("Error converting to BigInt:", e);
@@ -120,7 +96,6 @@ export default function GifQR({ proof }: { proof: string }) {
   function splitStringIntoChunks(str: string, chunkSize: number) {
     const chunks = [];
     let index = 0;
-    // console.log(str.length)
     while (index < str.length) {
       chunks.push(str.slice(index, index + chunkSize));
       index += chunkSize;
@@ -128,32 +103,23 @@ export default function GifQR({ proof }: { proof: string }) {
     console.log("chunks.length", chunks.length);
     return chunks;
   }
-  // console.log("proof in GirQR", proof);
   const tick = useRef<NodeJS.Timeout | number | null>(null);
 
   const [currentQRCode, setCurrentQRCode] = useState(0);
   const [arrayOfChunks, setArrayOfChunks] = useState<string[]>([]);
 
   useEffect(() => {
-    // const hexProof = decToHex(proof);
-    // const hexProof = decToBaseN(proof, 62);
     const hexProof = decToBaseN(proof, 62);
-    // console.log("hexProof", hexProof?.length);
 
     if (!hexProof) {
       throw new Error("Invalid proof");
     }
-    // console.log("hexProof", hexProof);
     const arrayOfChunks = splitStringIntoChunks(hexProof, chunkSize);
     setArrayOfChunks(arrayOfChunks);
   }, [proof, setArrayOfChunks]);
 
   useEffect(() => {
     tick.current = setInterval(() => {
-      // console.log('tick')
-
-      // console.log("currentQRCode", currentQRCode);
-      // console.log("arrayOfChunks.length", arrayOfChunks.length);
       let nextIndex = currentQRCode + 1;
       if (nextIndex === arrayOfChunks.length) {
         nextIndex = 0;
@@ -168,10 +134,6 @@ export default function GifQR({ proof }: { proof: string }) {
     }, 400);
     return () => clearInterval(tick.current as any);
   }, [setCurrentQRCode, currentQRCode, arrayOfChunks]);
-
-  // console.log(proof)
-  // console.log(arrayOfChunks.length)
-  // console.log(arrayOfChunks[0])
 
   const QRCodes = arrayOfChunks.map((chunk, i) => {
     let id;
@@ -208,5 +170,4 @@ export default function GifQR({ proof }: { proof: string }) {
   });
 
   return <main className="p-8 w-7/12 m-auto">{QRCodes[currentQRCode]}</main>;
-  // return <main className='p-8 w-7/12 m-auto'>{QRCodes[8]}</main>
 }
