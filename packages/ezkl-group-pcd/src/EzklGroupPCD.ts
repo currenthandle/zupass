@@ -63,6 +63,7 @@ async function getGenWitness() {
   try {
     const module = await import("@ezkljs/engine/web/ezkl");
     const genWitness = module.genWitness;
+    console.log("genWitness", genWitness);
     return genWitness;
   } catch (err) {
     console.error("Failed to import module:", err);
@@ -143,29 +144,14 @@ export async function prove(args: EzklGroupPCDArgs): Promise<EzklGroupPCD> {
   if (!init) {
     throw new Error("Failed to import module init");
   }
-  console.log("init", init);
 
   await init(
     "/ezkl-artifacts/ezkl_bg.wasm",
     new WebAssembly.Memory({ initial: 20, maximum: 1024, shared: true })
   );
-  console.log("already inited");
-  // note: this causes circular dependency
-  // const displayPCD = await EzklDisplayPCDPackage.deserialize(
-  //   args.displayPCD.value.pcd
-  // );
+
   const displayPCD = JSONBig().parse(args.displayPCD.value.pcd);
   const { secretPCD } = displayPCD.proof;
-  console.log("secretPCD", secretPCD);
-
-  // const wasm = await init(
-  //   // "http://localhost:3000/ezkl-artifacts/ezkl_bg.wasm",
-  //   // "https://passport-client-3km0.onrender.com/ezkl-artifacts/ezkl_bg.wasm",
-  //   "/ezkl-artifacts/ezkl_bg.wasm",
-  //   new WebAssembly.Memory({ initial: 20, maximum: 1024, shared: true })
-  // );
-
-  // console.log("wasm", wasm);
 
   const genWitness = await getGenWitness();
   if (!genWitness) {
@@ -191,7 +177,6 @@ export async function prove(args: EzklGroupPCDArgs): Promise<EzklGroupPCD> {
   const { clearSecret } = secretPCD.proof;
   const float = stringToFloat(clearSecret);
 
-  console.log("float", float);
   const floatToVecU64 = await getFloatToVecU64();
   if (!floatToVecU64) {
     throw new Error("Float to vec u64 not found");
@@ -216,11 +201,14 @@ export async function prove(args: EzklGroupPCDArgs): Promise<EzklGroupPCD> {
   const jsonWitness = JSONBig.stringify(inputObj);
   const encodedWitness = new TextEncoder().encode(jsonWitness);
   const witnessInput = new Uint8ClampedArray(encodedWitness.buffer);
-  console.log("witnessInput", witnessInput, genWitness);
 
-  const witness = new Uint8ClampedArray(
-    genWitness(model, witnessInput, settings)
-  );
+  console.log("model", JSON.stringify(model));
+  console.log("witnessInput", JSONBig.stringify(witnessInput));
+  const genWitnessResult = genWitness(model, witnessInput);
+  console.log("genWitnessResult", genWitnessResult);
+
+  const witness = new Uint8ClampedArray();
+  // genWitness(model, witnessInput, settings)
   console.log("witness", witness);
 
   // FETCH PK
