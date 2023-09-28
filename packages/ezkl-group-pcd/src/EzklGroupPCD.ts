@@ -40,6 +40,8 @@ function unit8ArrayToJsonObect(uint8Array: Uint8Array) {
 async function getInit() {
   try {
     const module = await import("@ezkljs/engine/web/ezkl");
+    console.log("module", module);
+
     const init = module.default;
     return init;
   } catch (err) {
@@ -136,26 +138,36 @@ export async function prove(args: EzklGroupPCDArgs): Promise<EzklGroupPCD> {
   if (!args.displayPCD.value) {
     throw new Error("Cannot make group proof: missing secret pcd");
   }
+  const init = await getInit();
+
+  if (!init) {
+    throw new Error("Failed to import module init");
+  }
+  console.log("init", init);
+
+  await init(
+    "/ezkl-artifacts/ezkl_bg.wasm",
+    new WebAssembly.Memory({ initial: 20, maximum: 1024, shared: true })
+  );
+  console.log("already inited");
   // note: this causes circular dependency
   // const displayPCD = await EzklDisplayPCDPackage.deserialize(
   //   args.displayPCD.value.pcd
   // );
   const displayPCD = JSONBig().parse(args.displayPCD.value.pcd);
   const { secretPCD } = displayPCD.proof;
+  console.log("secretPCD", secretPCD);
+
+  // const wasm = await init(
+  //   // "http://localhost:3000/ezkl-artifacts/ezkl_bg.wasm",
+  //   // "https://passport-client-3km0.onrender.com/ezkl-artifacts/ezkl_bg.wasm",
+  //   "/ezkl-artifacts/ezkl_bg.wasm",
+  //   new WebAssembly.Memory({ initial: 20, maximum: 1024, shared: true })
+  // );
+
+  // console.log("wasm", wasm);
 
   const genWitness = await getGenWitness();
-  const init = await getInit();
-
-  if (!init) {
-    throw new Error("Failed to import module init");
-  }
-  await init(
-    // "http://localhost:3000/ezkl-artifacts/ezkl_bg.wasm",
-    // "https://passport-client-3km0.onrender.com/ezkl-artifacts/ezkl_bg.wasm",
-    "/ezkl-artifacts/ezkl_bg.wasm",
-    new WebAssembly.Memory({ initial: 20, maximum: 1024, shared: true })
-  );
-
   if (!genWitness) {
     throw new Error("Failed to import module genWitness");
   }
@@ -179,6 +191,7 @@ export async function prove(args: EzklGroupPCDArgs): Promise<EzklGroupPCD> {
   const { clearSecret } = secretPCD.proof;
   const float = stringToFloat(clearSecret);
 
+  console.log("float", float);
   const floatToVecU64 = await getFloatToVecU64();
   if (!floatToVecU64) {
     throw new Error("Float to vec u64 not found");
@@ -203,10 +216,12 @@ export async function prove(args: EzklGroupPCDArgs): Promise<EzklGroupPCD> {
   const jsonWitness = JSONBig.stringify(inputObj);
   const encodedWitness = new TextEncoder().encode(jsonWitness);
   const witnessInput = new Uint8ClampedArray(encodedWitness.buffer);
+  console.log("witnessInput", witnessInput, genWitness);
 
   const witness = new Uint8ClampedArray(
     genWitness(model, witnessInput, settings)
   );
+  console.log("witness", witness);
 
   // FETCH PK
   const pkResp = await fetch("/ezkl-artifacts/test.pk");
