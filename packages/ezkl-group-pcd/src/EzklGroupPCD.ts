@@ -204,9 +204,11 @@ export async function prove(args: EzklGroupPCDArgs): Promise<EzklGroupPCD> {
   const encodedWitness = new TextEncoder().encode(jsonWitness);
   const witnessInput = new Uint8ClampedArray(encodedWitness.buffer);
 
+  console.log("before genWitness");
   const witness = new Uint8ClampedArray(
     genWitness(model, witnessInput, settings)
   );
+  console.log("after genWitness");
 
   // FETCH PK
   const pkResp = await fetch("/ezkl-artifacts/test.pk");
