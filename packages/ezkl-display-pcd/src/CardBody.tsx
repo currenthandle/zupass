@@ -17,7 +17,8 @@ import GifQR from "./GifQR";
 import { RingLoader } from "react-spinners";
 
 export function EzklDisplayCardBody({ pcd }: { pcd: EzklDisplayPCD }) {
-  // const ticketData = getTicketData(pcd);
+  // const ticketData = getTicketData(pcd);: dataStr
+  // console.log("DISPLAY CARD", pcd);
 
   const [groupPCD, setGroupPCD] = useState<EzklGroupPCD | null>(null);
 
@@ -50,6 +51,9 @@ export function EzklDisplayCardBody({ pcd }: { pcd: EzklDisplayPCD }) {
   //     <TextContainer>this is a test</TextContainer>
   //   </Container>
   // );
+  // console.log("DISPLAY CARD", groupPCD?.proof?.proof);
+  const decodedArray = new TextDecoder().decode(groupPCD?.proof?.proof);
+  // console.log("DISPLAY CARD", decodedArray);
   return (
     <Container>
       {/* <p>EZKL Group Membership PCD</p> */}
@@ -57,7 +61,7 @@ export function EzklDisplayCardBody({ pcd }: { pcd: EzklDisplayPCD }) {
       {groupPCD ? (
         <div>
           {/* <FieldLabel>Secret</FieldLabel> */}
-          <GifQR proof={groupPCD.proof.proof.toString()} />
+          <GifQR proof={groupPCD?.proof?.proof} />
         </div>
       ) : (
         <div className="w-full">

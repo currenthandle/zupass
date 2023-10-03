@@ -110,8 +110,8 @@ export interface EzklGroupPCDClaim {
 }
 
 export interface EzklGroupPCDProof {
-  // proof: Uint8ClampedArray;
-  proof: string;
+  proof: Uint8ClampedArray;
+  // proof: string;
   // witness: Uint8ClampedArray;
 }
 
@@ -248,11 +248,8 @@ export async function prove(args: EzklGroupPCDArgs): Promise<EzklGroupPCD> {
   if (!ezklProve) {
     throw new Error("Failed to import module");
   }
-  const proof = await ezklProve(
-    new Uint8ClampedArray(witnessUint8),
-    pk,
-    model,
-    srs
+  const proof = new Uint8ClampedArray(
+    await ezklProve(new Uint8ClampedArray(witnessUint8), pk, model, srs)
   );
   // const compressedData = new Uint8ClampedArray(gzip(proof, { level: 9 }));
   // const compressedData = gzip(proof, { level: 9 });
@@ -260,25 +257,25 @@ export async function prove(args: EzklGroupPCDArgs): Promise<EzklGroupPCD> {
 
   // console.log("proof as json string", JSONBig.stringify(proof));
 
-  function convertDataToString(data: Uint8Array) {
-    let string = "";
-    for (let i = 0; i < data.length; i++) {
-      // string += String.fromCharCode(data[i]);
-      const elmToStr = data[i].toString();
-      if (elmToStr.length === 1) {
-        string += "00" + elmToStr;
-      } else if (elmToStr.length === 2) {
-        string += "0" + elmToStr;
-      } else {
-        string += elmToStr;
-      }
-    }
-    return string;
-  }
+  // function convertDataToString(data: Uint8Array) {
+  //   let string = "";
+  //   for (let i = 0; i < data.length; i++) {
+  //     // string += String.fromCharCode(data[i]);
+  //     const elmToStr = data[i].toString();
+  //     if (elmToStr.length === 1) {
+  //       string += "00" + elmToStr;
+  //     } else if (elmToStr.length === 2) {
+  //       string += "0" + elmToStr;
+  //     } else {
+  //       string += elmToStr;
+  //     }
+  //   }
+  //   return string;
+  // }
 
-  const dataStr = convertDataToString(proof);
-  console.log("proof", proof);
-  console.log("dataStr", dataStr);
+  // const dataStr = convertDataToString(proof);
+  // console.log("proof", proof);
+  // console.log("dataStr", dataStr);
 
   // const verify = await getVerify();
   // if (!verify) {
@@ -302,7 +299,8 @@ export async function prove(args: EzklGroupPCDArgs): Promise<EzklGroupPCD> {
   // const verified = await verify(proof, vk, settings, srs);
   // console.log("VERIFIED", verified);
 
-  return new EzklGroupPCD(uuid(), { groupName: "GROUP1" }, { proof: dataStr });
+  // return new EzklGroupPCD(uuid(), { groupName: "GROUP1" }, { proof: dataStr });
+  return new EzklGroupPCD(uuid(), { groupName: "GROUP1" }, { proof });
 }
 
 export async function verify(pcd: EzklGroupPCD): Promise<boolean> {
