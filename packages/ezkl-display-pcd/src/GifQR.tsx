@@ -92,11 +92,11 @@ export default function GifQR({ proof }: { proof: Uint8ClampedArray }) {
   //   }
   //   return s;
   // }
-  function uint8ClampedArrayToString(data) {
-    return String.fromCharCode.apply(null, data);
+  function uint8ClampedArrayToString(data: Uint8ClampedArray): string {
+    return String.fromCharCode.apply(null, Array.from(data)) as string;
   }
 
-  function stringToUint8ClampedArray(str) {
+  function stringToUint8ClampedArray(str: string): Uint8ClampedArray {
     const buffer = new Uint8ClampedArray(str.length);
     for (let i = 0; i < str.length; i++) {
       buffer[i] = str.charCodeAt(i);
@@ -104,12 +104,12 @@ export default function GifQR({ proof }: { proof: Uint8ClampedArray }) {
     return buffer;
   }
 
-  function uint8ClampedArrayToBase64(data) {
+  function uint8ClampedArrayToBase64(data: Uint8ClampedArray): string {
     const str = uint8ClampedArrayToString(data);
     return btoa(str);
   }
 
-  function base64ToUint8ClampedArray(base64) {
+  function base64ToUint8ClampedArray(base64: string): Uint8ClampedArray {
     const str = atob(base64);
     return stringToUint8ClampedArray(str);
   }
@@ -152,6 +152,7 @@ export default function GifQR({ proof }: { proof: Uint8ClampedArray }) {
   useEffect(() => {
     // const hexProof = decToBaseN(proof, 62);
     const encodedProof = uint8ClampedArrayToBase64(proof);
+
     const decodedProof = base64ToUint8ClampedArray(encodedProof);
     console.log("====================================");
     console.log("====================================");
@@ -167,8 +168,9 @@ export default function GifQR({ proof }: { proof: Uint8ClampedArray }) {
     console.log("====================================");
     console.log("====================================");
 
-    console.log("proof", proof);
-    console.log("decodedProof", decodedProof);
+    console.log("encodedProof", encodedProof);
+    // console.log("proof", proof);
+    // console.log("decodedProof", decodedProof);
 
     if (!encodedProof) {
       throw new Error("Invalid proof");
