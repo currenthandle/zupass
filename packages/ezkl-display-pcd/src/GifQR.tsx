@@ -7,7 +7,7 @@ import "setimmediate";
 
 const chunkSize = 480; // The max length for each chunk
 
-export default function GifQR({ proof }: { proof: string }) {
+export default function GifQR({ proof }: { proof: Uint8ClampedArray }) {
   const socketRef = useRef<Socket | null>(null);
   const [skipChunks, setSkipChunks] = useState<Record<number, true>>({});
   useEffect(() => {
@@ -41,56 +41,77 @@ export default function GifQR({ proof }: { proof: string }) {
     };
   }, []);
 
-  const BASE62 =
-    "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  // const BASE62 =
+  //   "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-  function decToBaseN(decStr: string, base: number): string | null {
-    // Count the leading zeros
-    const leadingZeros = decStr.match(/^0+/);
-    let zerosCount = 0;
-    if (leadingZeros) {
-      zerosCount = leadingZeros[0].length;
-    }
-    console.log(`Count of leading zeros in decimal: ${zerosCount}`);
+  // function decToBaseN(decStr: string, base: number): string | null {
+  //   // Count the leading zeros
+  //   const leadingZeros = decStr.match(/^0+/);
+  //   let zerosCount = 0;
+  //   if (leadingZeros) {
+  //     zerosCount = leadingZeros[0].length;
+  //   }
+  //   console.log(`Count of leading zeros in decimal: ${zerosCount}`);
 
-    // Validate if it's a number
-    if (!/^\d+$/.test(decStr)) {
-      console.log(`Invalid input: ${decStr} is not a decimal number.`);
-      return null;
-    }
+  //   // Validate if it's a number
+  //   if (!/^\d+$/.test(decStr)) {
+  //     console.log(`Invalid input: ${decStr} is not a decimal number.`);
+  //     return null;
+  //   }
 
-    try {
-      const decimalPart = decStr.slice(zerosCount);
+  //   try {
+  //     const decimalPart = decStr.slice(zerosCount);
 
-      const decimal = BigInt(decimalPart);
+  //     const decimal = BigInt(decimalPart);
 
-      let converted = "";
-      if (base <= 36) {
-        converted = decimal.toString(base);
-      } else if (base === 62) {
-        converted = toBase62(decimal);
-      } else {
-        console.log(`Unsupported base: ${base}`);
-        return null;
-      }
-      const leadingConvertedZeros = "0".repeat(zerosCount);
+  //     let converted = "";
+  //     if (base <= 36) {
+  //       converted = decimal.toString(base);
+  //     } else if (base === 62) {
+  //       converted = toBase62(decimal);
+  //     } else {
+  //       console.log(`Unsupported base: ${base}`);
+  //       return null;
+  //     }
+  //     const leadingConvertedZeros = "0".repeat(zerosCount);
 
-      const result = leadingConvertedZeros + converted;
-      return result;
-    } catch (e) {
-      console.error("Error converting to BigInt:", e);
-      return null;
-    }
+  //     const result = leadingConvertedZeros + converted;
+  //     return result;
+  //   } catch (e) {
+  //     console.error("Error converting to BigInt:", e);
+  //     return null;
+  //   }
+  // }
+
+  // function toBase62(num: bigint): string {
+  //   if (num === 0n) return BASE62[0];
+  //   let s = "";
+  //   while (num > 0n) {
+  //     s = BASE62[Number(num % 62n)] + s;
+  //     num = num / 62n;
+  //   }
+  //   return s;
+  // }
+  function uint8ClampedArrayToString(data) {
+    return String.fromCharCode.apply(null, data);
   }
 
-  function toBase62(num: bigint): string {
-    if (num === 0n) return BASE62[0];
-    let s = "";
-    while (num > 0n) {
-      s = BASE62[Number(num % 62n)] + s;
-      num = num / 62n;
+  function stringToUint8ClampedArray(str) {
+    const buffer = new Uint8ClampedArray(str.length);
+    for (let i = 0; i < str.length; i++) {
+      buffer[i] = str.charCodeAt(i);
     }
-    return s;
+    return buffer;
+  }
+
+  function uint8ClampedArrayToBase64(data) {
+    const str = uint8ClampedArrayToString(data);
+    return btoa(str);
+  }
+
+  function base64ToUint8ClampedArray(base64) {
+    const str = atob(base64);
+    return stringToUint8ClampedArray(str);
   }
 
   function splitStringIntoChunks(str: string, chunkSize: number) {
@@ -100,7 +121,7 @@ export default function GifQR({ proof }: { proof: string }) {
       chunks.push(str.slice(index, index + chunkSize));
       index += chunkSize;
     }
-    console.log("chunks.length", chunks.length);
+    // console.log("chunks.length", chunks.length);
     return chunks;
   }
   const tick = useRef<NodeJS.Timeout | number | null>(null);
@@ -108,13 +129,51 @@ export default function GifQR({ proof }: { proof: string }) {
   const [currentQRCode, setCurrentQRCode] = useState(0);
   const [arrayOfChunks, setArrayOfChunks] = useState<string[]>([]);
 
-  useEffect(() => {
-    const hexProof = decToBaseN(proof, 62);
+  function areUint8ClampedArraysEqual(
+    arr1: Uint8ClampedArray,
+    arr2: Uint8ClampedArray
+  ) {
+    // Check if their lengths are the same
+    if (arr1.length !== arr2.length) {
+      return false;
+    }
 
-    if (!hexProof) {
+    // Check if every element is the same
+    for (let i = 0; i < arr1.length; i++) {
+      if (arr1[i] !== arr2[i]) {
+        return false;
+      }
+    }
+
+    // If none of the above checks failed, the arrays are equal
+    return true;
+  }
+
+  useEffect(() => {
+    // const hexProof = decToBaseN(proof, 62);
+    const encodedProof = uint8ClampedArrayToBase64(proof);
+    const decodedProof = base64ToUint8ClampedArray(encodedProof);
+    console.log("====================================");
+    console.log("====================================");
+    console.log("====================================");
+    console.log("====================================");
+    console.log("====================================");
+    console.log("====================================");
+    console.log(areUint8ClampedArraysEqual(proof, decodedProof));
+    console.log("====================================");
+    console.log("====================================");
+    console.log("====================================");
+    console.log("====================================");
+    console.log("====================================");
+    console.log("====================================");
+
+    console.log("proof", proof);
+    console.log("decodedProof", decodedProof);
+
+    if (!encodedProof) {
       throw new Error("Invalid proof");
     }
-    const arrayOfChunks = splitStringIntoChunks(hexProof, chunkSize);
+    const arrayOfChunks = splitStringIntoChunks(encodedProof, chunkSize);
     setArrayOfChunks(arrayOfChunks);
   }, [proof, setArrayOfChunks]);
 
