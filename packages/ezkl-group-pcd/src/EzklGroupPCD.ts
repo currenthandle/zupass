@@ -215,37 +215,18 @@ export async function prove(args: EzklGroupPCDArgs): Promise<EzklGroupPCD> {
       73616177511686234
     ]
   ]`;
-  console.log("hashedSet", JSONBig.parse(hashedSet));
+
   const inputObj = {
     input_data: [[0], JSONBig.parse(hashedSet)]
   };
-
-  // const inputFetchedResp = await fetch("/ezkl-artifacts/input.json");
-  // const inputFetchedBuf = await inputFetchedResp.arrayBuffer();
-  // const inputFetched = new TextDecoder().decode(inputFetchedBuf);
-  console.log("inputObj", inputObj);
-  console.log("stringify", JSONBig.stringify(inputObj));
 
   const inputStr = JSONBig.stringify(inputObj);
   const encodeInputBuf = new TextEncoder().encode(inputStr);
   const inputClamped = new Uint8ClampedArray(encodeInputBuf);
 
-  // const inputStr = JSONBig.stringify(inputFetched);
-  // const inputBuf = new TextEncoder().encode(inputStr);
-  // const inputStr = JSONBig.stringify(inputObj);
-  // const inputBuf = new TextEncoder().encode(inputStr);
-
-  console.log("before genWitness");
-  // const sampleWitness = genWitness(model, new Uint8ClampedArray(inputBuf));
-  // console.log("sampleWitness", JSONBig.parse(JSONBig.stringify(sampleWitness)));
-  // const witness = new Uint8ClampedArray(
-  //   genWitness(model, new Uint8ClampedArray(inputBuf))
-  // );
   const witnessUint8 = genWitness(model, inputClamped);
   const witnessJson = new TextDecoder().decode(witnessUint8);
   const witness = JSONBig.parse(witnessJson);
-  console.log("witness", witness);
-  console.log("after genWitness");
 
   // FETCH PKj
   const pkResp = await fetch("/ezkl-artifacts/test.pk");
@@ -267,18 +248,23 @@ export async function prove(args: EzklGroupPCDArgs): Promise<EzklGroupPCD> {
   if (!ezklProve) {
     throw new Error("Failed to import module");
   }
-  const proof = new Uint8ClampedArray(
-    await ezklProve(new Uint8ClampedArray(witnessUint8), pk, model, srs)
+  const proof = await ezklProve(
+    new Uint8ClampedArray(witnessUint8),
+    pk,
+    model,
+    srs
   );
-  const compressedData = new Uint8ClampedArray(gzip(proof, { level: 9 }));
+  // const compressedData = new Uint8ClampedArray(gzip(proof, { level: 9 }));
+  // const compressedData = gzip(proof, { level: 9 });
+  // console.log("compressedData", compressedData);
 
-  JSON;
+  // console.log("proof as json string", JSONBig.stringify(proof));
 
-  function convertCompressedDataToString(compressedData: Uint8ClampedArray) {
+  function convertDataToString(data: Uint8Array) {
     let string = "";
-    for (let i = 0; i < compressedData.length; i++) {
-      // string += String.fromCharCode(compressedData[i]);
-      const elmToStr = compressedData[i].toString();
+    for (let i = 0; i < data.length; i++) {
+      // string += String.fromCharCode(data[i]);
+      const elmToStr = data[i].toString();
       if (elmToStr.length === 1) {
         string += "00" + elmToStr;
       } else if (elmToStr.length === 2) {
@@ -290,36 +276,33 @@ export async function prove(args: EzklGroupPCDArgs): Promise<EzklGroupPCD> {
     return string;
   }
 
-  const compressedDataStr = convertCompressedDataToString(compressedData);
+  const dataStr = convertDataToString(proof);
+  console.log("proof", proof);
+  console.log("dataStr", dataStr);
 
-  const verify = await getVerify();
-  if (!verify) {
-    throw new Error("Failed to import module verify");
-  }
+  // const verify = await getVerify();
+  // if (!verify) {
+  //   throw new Error("Failed to import module verify");
+  // }
 
-  // LOAD VK
-  const vkResp = await fetch("/ezkl-artifacts/test.vk");
-  console.log("after fetch vk");
-  if (!vkResp.ok) {
-    throw new Error("Failed to fetch test.vk");
-  }
-  const vkBuf = await vkResp.arrayBuffer();
-  const vk = new Uint8ClampedArray(vkBuf);
-  console.log("after vkBuf");
+  // // LOAD VK
+  // const vkResp = await fetch("/ezkl-artifacts/test.vk");
+  // // console.log("after fetch vk");
+  // if (!vkResp.ok) {
+  //   throw new Error("Failed to fetch test.vk");
+  // }
+  // const vkBuf = await vkResp.arrayBuffer();
+  // const vk = new Uint8ClampedArray(vkBuf);
+  // console.log("after vkBuf");
 
-  const testPFResp = await fetch("/ezkl-artifacts/test.pf");
-  const testPF = new Uint8ClampedArray(await testPFResp.arrayBuffer());
+  // const testPFResp = await fetch("/ezkl-artifacts/test.pf");
+  // const testPF = new Uint8ClampedArray(await testPFResp.arrayBuffer());
+  // console.log("proof", proof);
 
-  const verified = await verify(proof, vk, settings, srs);
-  // const verified = await verify(testPF, vk, settings, srs);
-  console.log("VERIFIED", verified);
+  // const verified = await verify(proof, vk, settings, srs);
+  // console.log("VERIFIED", verified);
 
-  return new EzklGroupPCD(
-    uuid(),
-    { groupName: "GROUP1" },
-    // { proof: compressedData }
-    { proof: compressedDataStr }
-  );
+  return new EzklGroupPCD(uuid(), { groupName: "GROUP1" }, { proof: dataStr });
 }
 
 export async function verify(pcd: EzklGroupPCD): Promise<boolean> {
