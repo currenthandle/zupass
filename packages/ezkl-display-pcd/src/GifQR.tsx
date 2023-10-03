@@ -3,11 +3,12 @@ import { useEffect, useRef, useState } from "react";
 import JSONbig from "json-bigint";
 import { Socket } from "socket.io-client";
 import io from "socket.io-client";
+import { gzip, ungzip } from "pako";
 import "setimmediate";
 
 const chunkSize = 480; // The max length for each chunk
 
-export default function GifQR({ proof }: { proof: Uint8ClampedArray }) {
+export default function GifQR({ proof }: { proof: Uint8Array }) {
   const socketRef = useRef<Socket | null>(null);
   const [skipChunks, setSkipChunks] = useState<Record<number, true>>({});
   useEffect(() => {
@@ -92,24 +93,24 @@ export default function GifQR({ proof }: { proof: Uint8ClampedArray }) {
   //   }
   //   return s;
   // }
-  function uint8ClampedArrayToString(data: Uint8ClampedArray): string {
+  function uint8ClampedArrayToString(data: Uint8Array): string {
     return String.fromCharCode.apply(null, Array.from(data)) as string;
   }
 
-  function stringToUint8ClampedArray(str: string): Uint8ClampedArray {
-    const buffer = new Uint8ClampedArray(str.length);
+  function stringToUint8ClampedArray(str: string): Uint8Array {
+    const buffer = new Uint8Array(str.length);
     for (let i = 0; i < str.length; i++) {
       buffer[i] = str.charCodeAt(i);
     }
     return buffer;
   }
 
-  function uint8ClampedArrayToBase64(data: Uint8ClampedArray): string {
+  function uint8ClampedArrayToBase64(data: Uint8Array): string {
     const str = uint8ClampedArrayToString(data);
     return btoa(str);
   }
 
-  function base64ToUint8ClampedArray(base64: string): Uint8ClampedArray {
+  function base64ToUint8ClampedArray(base64: string): Uint8Array {
     const str = atob(base64);
     return stringToUint8ClampedArray(str);
   }
@@ -121,7 +122,7 @@ export default function GifQR({ proof }: { proof: Uint8ClampedArray }) {
       chunks.push(str.slice(index, index + chunkSize));
       index += chunkSize;
     }
-    // console.log("chunks.length", chunks.length);
+    console.log("chunks.length", chunks.length);
     return chunks;
   }
   const tick = useRef<NodeJS.Timeout | number | null>(null);
@@ -129,10 +130,7 @@ export default function GifQR({ proof }: { proof: Uint8ClampedArray }) {
   const [currentQRCode, setCurrentQRCode] = useState(0);
   const [arrayOfChunks, setArrayOfChunks] = useState<string[]>([]);
 
-  function areUint8ClampedArraysEqual(
-    arr1: Uint8ClampedArray,
-    arr2: Uint8ClampedArray
-  ) {
+  function areUint8ClampedArraysEqual(arr1: Uint8Array, arr2: Uint8Array) {
     // Check if their lengths are the same
     if (arr1.length !== arr2.length) {
       return false;
@@ -151,16 +149,18 @@ export default function GifQR({ proof }: { proof: Uint8ClampedArray }) {
 
   useEffect(() => {
     // const hexProof = decToBaseN(proof, 62);
-    const encodedProof = uint8ClampedArrayToBase64(proof);
+    const compressedProof = gzip(proof, { level: 9 });
+    const encodedProof = uint8ClampedArrayToBase64(compressedProof);
 
     const decodedProof = base64ToUint8ClampedArray(encodedProof);
+    const uncompressedProof = ungzip(decodedProof);
     console.log("====================================");
     console.log("====================================");
     console.log("====================================");
     console.log("====================================");
     console.log("====================================");
     console.log("====================================");
-    console.log(areUint8ClampedArraysEqual(proof, decodedProof));
+    console.log(areUint8ClampedArraysEqual(proof, uncompressedProof));
     console.log("====================================");
     console.log("====================================");
     console.log("====================================");
@@ -198,15 +198,20 @@ export default function GifQR({ proof }: { proof: Uint8ClampedArray }) {
 
   const QRCodes = arrayOfChunks.map((chunk, i) => {
     let id;
+
     if (i < 10) {
-      id = `0${i}`;
+      id = `00${i.toString()}`;
+    } else if (i < 100) {
+      id = `0${i.toString()}`;
     } else {
-      id = i;
+      id = i.toString();
     }
 
     let numChunks;
 
     if (arrayOfChunks.length < 10) {
+      numChunks = `00${arrayOfChunks.length.toString()}`;
+    } else if (arrayOfChunks.length < 100) {
       numChunks = `0${arrayOfChunks.length.toString()}`;
     } else {
       numChunks = arrayOfChunks.length.toString();

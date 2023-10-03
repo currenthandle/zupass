@@ -110,7 +110,7 @@ export interface EzklGroupPCDClaim {
 }
 
 export interface EzklGroupPCDProof {
-  proof: Uint8ClampedArray;
+  proof: Uint8Array;
   // proof: string;
   // witness: Uint8ClampedArray;
 }
@@ -248,8 +248,11 @@ export async function prove(args: EzklGroupPCDArgs): Promise<EzklGroupPCD> {
   if (!ezklProve) {
     throw new Error("Failed to import module");
   }
-  const proof = new Uint8ClampedArray(
-    await ezklProve(new Uint8ClampedArray(witnessUint8), pk, model, srs)
+  const proof = await ezklProve(
+    new Uint8ClampedArray(witnessUint8),
+    pk,
+    model,
+    srs
   );
   // const compressedData = new Uint8ClampedArray(gzip(proof, { level: 9 }));
   // const compressedData = gzip(proof, { level: 9 });

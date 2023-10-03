@@ -64,7 +64,7 @@ export function ScanGifScreen() {
     <AppContainer bg="gray">
       {!scanned ? (
         <>
-          <div>
+          <div style={{ whiteSpace: "normal" }}>
             {scans.map((scan, i) => {
               if (scan?.length > 0) {
                 return `${i},`;
@@ -84,9 +84,9 @@ export function ScanGifScreen() {
               }
 
               const data = result.getText();
-              const id = parseInt(data.substring(0, 2), 10);
-              const length = parseInt(data.substring(2, 4), 10);
-              const chunkData = data.substring(4);
+              const id = parseInt(data.substring(0, 3), 10);
+              const length = parseInt(data.substring(3, 6), 10);
+              const chunkData = data.substring(6);
 
               socketRef.current.emit("qrId", id);
 
