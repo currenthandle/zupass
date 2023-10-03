@@ -143,19 +143,17 @@ export async function prove(args: EzklGroupPCDArgs): Promise<EzklGroupPCD> {
   const displayPCD = JSONBig().parse(args.displayPCD.value.pcd);
   const { secretPCD } = displayPCD.proof;
 
-  const genWitness = await getGenWitness();
   const init = await getInit();
 
   if (!init) {
     throw new Error("Failed to import module init");
   }
   await init(
-    // "http://localhost:3000/ezkl-artifacts/ezkl_bg.wasm",
-    // "https://passport-client-3km0.onrender.com/ezkl-artifacts/ezkl_bg.wasm",
     "/ezkl-artifacts/ezkl_bg.wasm",
     new WebAssembly.Memory({ initial: 20, maximum: 1024, shared: true })
   );
 
+  const genWitness = await getGenWitness();
   if (!genWitness) {
     throw new Error("Failed to import module genWitness");
   }
@@ -179,36 +177,77 @@ export async function prove(args: EzklGroupPCDArgs): Promise<EzklGroupPCD> {
   const { clearSecret } = secretPCD.proof;
   const float = stringToFloat(clearSecret);
 
-  const floatToVecU64 = await getFloatToVecU64();
-  if (!floatToVecU64) {
-    throw new Error("Float to vec u64 not found");
-  }
-  const u64Ser = floatToVecU64(float, 0);
-  const u64Output = unit8ArrayToJsonObect(new Uint8Array(u64Ser.buffer));
-  const u64Array = [u64Output];
-  const string = JSONBig.stringify(u64Array);
-  const buffer = new TextEncoder().encode(string);
-  const u64sOutputSer = new Uint8ClampedArray(buffer.buffer);
-  const poseidonHash = await getPoseidonHash();
-  if (!poseidonHash) {
-    throw new Error("Poseidon hash not found");
-  }
-  const hash = await poseidonHash(u64sOutputSer);
-  const hashString = new TextDecoder().decode(hash);
-  const jsonHash = JSONBig.parse(hashString);
+  const hashedSet = `[
+    [
+      4572534320476584198, 16569434655355399807, 2934216378187574526,
+      407414070347714353
+    ],
+    [
+      9076552887107963406, 5988095838945484945, 9199181261850001878,
+      632050959657341670
+    ],
+    [
+      12305608786227911750, 9903581919532927302, 2907727335548365623,
+      737630934569201951
+    ],
+    [
+      5236164246842610752, 7116161584353376787, 5863925054592117601,
+      1720486879953014270
+    ],
+    [
+      8705747727513110919, 8368749124085643527, 1768788280531912488,
+      2785003347918012818
+    ],
+    [
+      11098220056660419283, 5728214177482673336, 17470378912069676664,
+      2311452660145672176
+    ],
+    [
+      7370671970298444243, 11290245180410780212, 15962375296642530508,
+      1372135491719419450
+    ],
+    [
+      12817781970450193072, 17513085767882081417, 8221563647785859506,
+      2500146335159376594
+    ],
+    [
+      3246365869747041386, 17437817983640603683, 6502307365827494142,
+      73616177511686234
+    ]
+  ]`;
+  console.log("hashedSet", JSONBig.parse(hashedSet));
   const inputObj = {
-    input_data: jsonHash,
-    output_data: [[]]
+    input_data: [[0], JSONBig.parse(hashedSet)]
   };
-  const jsonWitness = JSONBig.stringify(inputObj);
-  const encodedWitness = new TextEncoder().encode(jsonWitness);
-  const witnessInput = new Uint8ClampedArray(encodedWitness.buffer);
+
+  // const inputFetchedResp = await fetch("/ezkl-artifacts/input.json");
+  // const inputFetchedBuf = await inputFetchedResp.arrayBuffer();
+  // const inputFetched = new TextDecoder().decode(inputFetchedBuf);
+  console.log("inputObj", inputObj);
+  console.log("stringify", JSONBig.stringify(inputObj));
+
+  const inputStr = JSONBig.stringify(inputObj);
+  const encodeInputBuf = new TextEncoder().encode(inputStr);
+  const inputClamped = new Uint8ClampedArray(encodeInputBuf);
+
+  // const inputStr = JSONBig.stringify(inputFetched);
+  // const inputBuf = new TextEncoder().encode(inputStr);
+  // const inputStr = JSONBig.stringify(inputObj);
+  // const inputBuf = new TextEncoder().encode(inputStr);
 
   console.log("before genWitness");
-  const witness = new Uint8ClampedArray(genWitness(model, witnessInput));
+  // const sampleWitness = genWitness(model, new Uint8ClampedArray(inputBuf));
+  // console.log("sampleWitness", JSONBig.parse(JSONBig.stringify(sampleWitness)));
+  // const witness = new Uint8ClampedArray(
+  //   genWitness(model, new Uint8ClampedArray(inputBuf))
+  // );
+  const witnessUint8 = genWitness(model, inputClamped);
+  const witnessJson = new TextDecoder().decode(witnessUint8);
+  const witness = JSONBig.parse(witnessJson);
+  console.log("witness", witness);
   console.log("after genWitness");
 
-  // FETCH PK
+  // FETCH PKj
   const pkResp = await fetch("/ezkl-artifacts/test.pk");
   if (!pkResp.ok) {
     throw new Error("Failed to fetch pk.key");
@@ -228,8 +267,12 @@ export async function prove(args: EzklGroupPCDArgs): Promise<EzklGroupPCD> {
   if (!ezklProve) {
     throw new Error("Failed to import module");
   }
-  const proof = new Uint8ClampedArray(await ezklProve(witness, pk, model, srs));
+  const proof = new Uint8ClampedArray(
+    await ezklProve(new Uint8ClampedArray(witnessUint8), pk, model, srs)
+  );
   const compressedData = new Uint8ClampedArray(gzip(proof, { level: 9 }));
+
+  JSON;
 
   function convertCompressedDataToString(compressedData: Uint8ClampedArray) {
     let string = "";
@@ -256,13 +299,19 @@ export async function prove(args: EzklGroupPCDArgs): Promise<EzklGroupPCD> {
 
   // LOAD VK
   const vkResp = await fetch("/ezkl-artifacts/test.vk");
+  console.log("after fetch vk");
   if (!vkResp.ok) {
     throw new Error("Failed to fetch test.vk");
   }
   const vkBuf = await vkResp.arrayBuffer();
   const vk = new Uint8ClampedArray(vkBuf);
+  console.log("after vkBuf");
+
+  const testPFResp = await fetch("/ezkl-artifacts/test.pf");
+  const testPF = new Uint8ClampedArray(await testPFResp.arrayBuffer());
 
   const verified = await verify(proof, vk, settings, srs);
+  // const verified = await verify(testPF, vk, settings, srs);
   console.log("VERIFIED", verified);
 
   return new EzklGroupPCD(
