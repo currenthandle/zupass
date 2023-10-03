@@ -205,9 +205,7 @@ export async function prove(args: EzklGroupPCDArgs): Promise<EzklGroupPCD> {
   const witnessInput = new Uint8ClampedArray(encodedWitness.buffer);
 
   console.log("before genWitness");
-  const witness = new Uint8ClampedArray(
-    genWitness(model, witnessInput, settings)
-  );
+  const witness = new Uint8ClampedArray(genWitness(model, witnessInput));
   console.log("after genWitness");
 
   // FETCH PK
@@ -230,9 +228,7 @@ export async function prove(args: EzklGroupPCDArgs): Promise<EzklGroupPCD> {
   if (!ezklProve) {
     throw new Error("Failed to import module");
   }
-  const proof = new Uint8ClampedArray(
-    await ezklProve(witness, pk, model, settings, srs)
-  );
+  const proof = new Uint8ClampedArray(await ezklProve(witness, pk, model, srs));
   const compressedData = new Uint8ClampedArray(gzip(proof, { level: 9 }));
 
   function convertCompressedDataToString(compressedData: Uint8ClampedArray) {
