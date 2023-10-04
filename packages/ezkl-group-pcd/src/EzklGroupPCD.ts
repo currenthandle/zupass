@@ -217,7 +217,7 @@ export async function prove(args: EzklGroupPCDArgs): Promise<EzklGroupPCD> {
   ]`;
 
   const inputObj = {
-    input_data: [[0], JSONBig.parse(hashedSet)]
+    input_data: [[7.0], JSONBig.parse(hashedSet)]
   };
 
   const inputStr = JSONBig.stringify(inputObj);
