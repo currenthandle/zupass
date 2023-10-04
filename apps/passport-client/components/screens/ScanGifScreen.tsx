@@ -32,6 +32,16 @@ function base64ToUint8ClampedArray(base64: string): Uint8Array {
   return stringToUint8ClampedArray(str);
 }
 
+async function getInit() {
+  try {
+    const module = await import("@ezkljs/engine/web/ezkl");
+    const init = module.default;
+    return init;
+  } catch (err) {
+    console.error("Failed to import module:", err);
+  }
+}
+
 async function getVerify() {
   try {
     const module = await import("@ezkljs/engine/web/ezkl");
@@ -127,6 +137,9 @@ export function ScanGifScreen() {
 
       // const testPFResp = await fetch("/ezkl-artifacts/test.pf");
       // const testPF = new Uint8ClampedArray(await testPFResp.arrayBuffer());
+
+      // const testPFResp = await fetch("/ezkl-artifacts/test.pf");
+      // const testPF = new Uint8ClampedArray(await testPFResp.arrayBuffer());
       const aggScan = scans.join("");
       console.log("scans", scans);
       console.log("aggScan", aggScan);
@@ -136,8 +149,19 @@ export function ScanGifScreen() {
 
       console.log("proof", uncompressedProof);
 
+      const init = await getInit();
+
+      if (!init) {
+        throw new Error("Failed to import module init");
+      }
+      await init(
+        "/ezkl-artifacts/ezkl_bg.wasm",
+        new WebAssembly.Memory({ initial: 20, maximum: 1024, shared: true })
+      );
+
       const verified = await verify(
         new Uint8ClampedArray(uncompressedProof),
+        // testPF,
         vk,
         settings,
         srs
