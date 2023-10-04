@@ -9,6 +9,7 @@ import { AppContainer } from "../shared/AppContainer";
 import { useEffect, useRef, useState } from "react";
 import io from "socket.io-client";
 import { ungzip } from "pako";
+import { RingLoader } from "react-spinners";
 
 // function uint8ClampedArrayToString(data: Uint8Array): string {
 //   return String.fromCharCode.apply(null, Array.from(data)) as string;
@@ -60,6 +61,8 @@ export function ScanGifScreen() {
   const [numFrames, setNumFrames] = useState(0);
   // const [socket, setSocket] = useState(null);
   const socketRef = useRef(null);
+
+  const [verified, setVerified] = useState<boolean | null>(null);
 
   // const timer = useRef<NodeJS.Timeout | null>(null);
 
@@ -168,7 +171,9 @@ export function ScanGifScreen() {
           srs
         );
         console.log("VERIFIED", verified);
+        setVerified(verified);
       } catch (err) {
+        setVerified(false);
         console.log("NOT VERIFIED", err);
       }
     })();
@@ -233,10 +238,17 @@ export function ScanGifScreen() {
           <TextCenter>Scan a GIF verify</TextCenter>
         </>
       ) : (
-        <div>
-          {scans.map((scan, i) => {
-            return <div key={i}>{scan}</div>;
-          })}
+        <div style={{ marginTop: "5rem" }}>
+          {verified === null ? (
+            <RingLoader
+              color="#000000"
+              className="w-full m-auto flex justify-center"
+            />
+          ) : verified ? (
+            <div>Verified</div>
+          ) : (
+            <div>Not verified</div>
+          )}
         </div>
       )}
     </AppContainer>
