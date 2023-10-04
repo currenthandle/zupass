@@ -6,7 +6,8 @@ import io from "socket.io-client";
 import { gzip, ungzip } from "pako";
 import "setimmediate";
 
-const chunkSize = 480; // The max length for each chunk
+const CHUNK_SIZE = 400; // The max length for each chunk
+const FRAME_RATE = 200;
 
 export default function GifQR({ proof }: { proof: Uint8Array }) {
   const socketRef = useRef<Socket | null>(null);
@@ -179,7 +180,7 @@ export default function GifQR({ proof }: { proof: Uint8Array }) {
     if (!encodedProof) {
       throw new Error("Invalid proof");
     }
-    const arrayOfChunks = splitStringIntoChunks(encodedProof, chunkSize);
+    const arrayOfChunks = splitStringIntoChunks(encodedProof, CHUNK_SIZE);
     setArrayOfChunks(arrayOfChunks);
   }, [proof, setArrayOfChunks]);
 
@@ -196,7 +197,7 @@ export default function GifQR({ proof }: { proof: Uint8Array }) {
         }
       }
       setCurrentQRCode(nextIndex);
-    }, 400);
+    }, FRAME_RATE);
     return () => clearInterval(tick.current as any);
   }, [setCurrentQRCode, currentQRCode, arrayOfChunks]);
 
