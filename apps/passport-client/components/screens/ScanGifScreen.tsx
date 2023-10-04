@@ -159,14 +159,18 @@ export function ScanGifScreen() {
         new WebAssembly.Memory({ initial: 20, maximum: 1024, shared: true })
       );
 
-      const verified = await verify(
-        new Uint8ClampedArray(uncompressedProof),
-        // testPF,
-        vk,
-        settings,
-        srs
-      );
-      console.log("VERIFIED", verified);
+      try {
+        const verified = await verify(
+          new Uint8ClampedArray(uncompressedProof),
+          // testPF,
+          vk,
+          settings,
+          srs
+        );
+        console.log("VERIFIED", verified);
+      } catch (err) {
+        console.log("NOT VERIFIED", err);
+      }
     })();
   }
   return (
