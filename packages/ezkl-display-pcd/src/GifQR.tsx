@@ -149,8 +149,12 @@ export default function GifQR({ proof }: { proof: Uint8Array }) {
 
   useEffect(() => {
     // const hexProof = decToBaseN(proof, 62);
+    console.log("proof", proof);
+    // const proof = new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8, 9]);
+
     const compressedProof = gzip(proof, { level: 9 });
     const encodedProof = uint8ClampedArrayToBase64(compressedProof);
+    console.log("encodedProof", encodedProof);
 
     const decodedProof = base64ToUint8ClampedArray(encodedProof);
     const uncompressedProof = ungzip(decodedProof);

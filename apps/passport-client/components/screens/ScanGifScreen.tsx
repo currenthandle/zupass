@@ -8,6 +8,39 @@ import { icons } from "../icons";
 import { AppContainer } from "../shared/AppContainer";
 import { useEffect, useRef, useState } from "react";
 import io from "socket.io-client";
+import { ungzip } from "pako";
+
+// function uint8ClampedArrayToString(data: Uint8Array): string {
+//   return String.fromCharCode.apply(null, Array.from(data)) as string;
+// }
+
+function stringToUint8ClampedArray(str: string): Uint8Array {
+  const buffer = new Uint8Array(str.length);
+  for (let i = 0; i < str.length; i++) {
+    buffer[i] = str.charCodeAt(i);
+  }
+  return buffer;
+}
+
+// function uint8ClampedArrayToBase64(data: Uint8Array): string {
+//   const str = uint8ClampedArrayToString(data);
+//   return btoa(str);
+// }
+
+function base64ToUint8ClampedArray(base64: string): Uint8Array {
+  const str = atob(base64);
+  return stringToUint8ClampedArray(str);
+}
+
+async function getVerify() {
+  try {
+    const module = await import("@ezkljs/engine/web/ezkl");
+    const verify = module.verify;
+    return verify;
+  } catch (err) {
+    console.error("Failed to import module:", err);
+  }
+}
 
 // Scan a PCD QR code, then go to /verify to verify and display the proof.
 export function ScanGifScreen() {
@@ -60,6 +93,58 @@ export function ScanGifScreen() {
       setScanned(true);
     }
   }, [numFrames, scans]);
+
+  if (scanned) {
+    (async () => {
+      const verify = await getVerify();
+      if (!verify) {
+        throw new Error("Failed to import module verify");
+      }
+
+      // LOAD VK
+      const vkResp = await fetch("/ezkl-artifacts/test.vk");
+      // console.log("after fetch vk");
+      if (!vkResp.ok) {
+        throw new Error("Failed to fetch test.vk");
+      }
+      const vkBuf = await vkResp.arrayBuffer();
+      const vk = new Uint8ClampedArray(vkBuf);
+      console.log("after vkBuf");
+
+      const settingsResp = await fetch("/ezkl-artifacts/settings.json");
+      if (!settingsResp.ok) {
+        throw new Error("Failed to fetch settings.json");
+      }
+      const settingsBuf = await settingsResp.arrayBuffer();
+      const settings = new Uint8ClampedArray(settingsBuf);
+
+      const srsResp = await fetch("/ezkl-artifacts/kzg.srs");
+      if (!srsResp.ok) {
+        throw new Error("Failed to fetch kzg.srs");
+      }
+      const srsBuf = await srsResp.arrayBuffer();
+      const srs = new Uint8ClampedArray(srsBuf);
+
+      // const testPFResp = await fetch("/ezkl-artifacts/test.pf");
+      // const testPF = new Uint8ClampedArray(await testPFResp.arrayBuffer());
+      const aggScan = scans.join("");
+      console.log("scans", scans);
+      console.log("aggScan", aggScan);
+
+      const decodedProof = base64ToUint8ClampedArray(aggScan);
+      const uncompressedProof = ungzip(decodedProof);
+
+      console.log("proof", uncompressedProof);
+
+      const verified = await verify(
+        new Uint8ClampedArray(uncompressedProof),
+        vk,
+        settings,
+        srs
+      );
+      console.log("VERIFIED", verified);
+    })();
+  }
   return (
     <AppContainer bg="gray">
       {!scanned ? (
@@ -85,22 +170,23 @@ export function ScanGifScreen() {
 
               const data = result.getText();
               const id = parseInt(data.substring(0, 3), 10);
-              const length = parseInt(data.substring(3, 6), 10);
+              const totalFrames = parseInt(data.substring(3, 6), 10);
               const chunkData = data.substring(6);
+              console.log("data", data);
 
               socketRef.current.emit("qrId", id);
 
               if (numFrames === 0) {
                 // console.log("setNumFrames", length);
-                setNumFrames(length);
+                setNumFrames(totalFrames);
               }
 
-              if (!scans[id]) {
+              if (scans[id] === undefined) {
                 // console.log("");
                 // console.log("scans[id]", scans[id]);
                 // console.log("setScans", id);
-                const newScans = [...scans];
-                newScans[id] = chunkData;
+                // const newScans = [...scans];
+                // newScans[id] = chunkData.slice(6);
                 // console.log("newScans", newScans);
                 // setScans(newScans);
                 setScans((prevScans) => {
