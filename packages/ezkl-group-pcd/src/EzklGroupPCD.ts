@@ -221,8 +221,16 @@ export async function prove(args: EzklGroupPCDArgs): Promise<EzklGroupPCD> {
     ]
   ]`;
 
+  const hashSetServerResp = await fetch(url + "hash_set.json");
+
+  const hashSetServerBuf = await hashSetServerResp.arrayBuffer();
+  const hashSetServer = new Uint8ClampedArray(hashSetServerBuf);
+  const hashSetServerString = new TextDecoder().decode(hashSetServer);
+  const hashSetServerObj = JSONBig.parse(hashSetServerString);
+  const hashSet = hashSetServerObj.y_input;
+
   const inputObj = {
-    input_data: [[7.0], JSONBig.parse(hashedSet)]
+    input_data: [[7.0], hashSet]
   };
 
   const inputStr = JSONBig.stringify(inputObj);
