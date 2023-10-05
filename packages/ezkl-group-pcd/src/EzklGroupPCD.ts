@@ -133,6 +133,9 @@ export class EzklGroupPCD implements PCD<EzklGroupPCDClaim, EzklGroupPCDProof> {
 }
 
 export async function prove(args: EzklGroupPCDArgs): Promise<EzklGroupPCD> {
+  const HOST = "http://localhost:5001";
+  const ROUTE = "/public";
+  const url = `${HOST}${ROUTE}/`;
   if (!args.displayPCD.value) {
     throw new Error("Cannot make group proof: missing secret pcd");
   }
@@ -159,7 +162,8 @@ export async function prove(args: EzklGroupPCDArgs): Promise<EzklGroupPCD> {
   }
 
   // FETCH COMPILED MODEL
-  const compiliedModelResp = await fetch("/ezkl-artifacts/network.compiled");
+  // const compiliedModelResp = await fetch("/ezkl-artifacts/network.compiled");
+  const compiliedModelResp = await fetch(url + "network.compiled");
   if (!compiliedModelResp.ok) {
     throw new Error("Failed to fetch network.compiled");
   }
@@ -167,7 +171,8 @@ export async function prove(args: EzklGroupPCDArgs): Promise<EzklGroupPCD> {
   const model = new Uint8ClampedArray(modelBuf);
 
   // FETCH SETTINGS
-  const settingsResp = await fetch("/ezkl-artifacts/settings.json");
+  // const settingsResp = await fetch("/ezkl-artifacts/settings.json");
+  const settingsResp = await fetch(url + "settings.json");
   if (!settingsResp.ok) {
     throw new Error("Failed to fetch settings.json");
   }
@@ -229,7 +234,8 @@ export async function prove(args: EzklGroupPCDArgs): Promise<EzklGroupPCD> {
   const witness = JSONBig.parse(witnessJson);
 
   // FETCH PKj
-  const pkResp = await fetch("/ezkl-artifacts/test.pk");
+  // const pkResp = await fetch("/ezkl-artifacts/test.pk");
+  const pkResp = await fetch(url + "test.pk");
   if (!pkResp.ok) {
     throw new Error("Failed to fetch pk.key");
   }
@@ -237,7 +243,8 @@ export async function prove(args: EzklGroupPCDArgs): Promise<EzklGroupPCD> {
   const pk = new Uint8ClampedArray(pkBuf);
 
   // FETCH SRS
-  const srsResp = await fetch("/ezkl-artifacts/kzg.srs");
+  // const srsResp = await fetch("/ezkl-artifacts/kzg.srs");
+  const srsResp = await fetch(url + "kzg.srs");
   if (!srsResp.ok) {
     throw new Error("Failed to fetch kzg.srs");
   }
