@@ -126,6 +126,20 @@ export async function prove(args: EzklSecretPCDArgs): Promise<EzklSecretPCD> {
     throw new Error("Poseidon hash not found");
   }
   const hash = await poseidonHash(u64sOutputSer);
+  console.log("hashed", hash);
+  const decodedHash = new TextDecoder().decode(new Uint8Array(hash));
+  // const stringy = JSONBig.stringify(decodedHash);
+  const hashObj = JSONBig.parse(decodedHash);
+  console.log("decoded hash", decodedHash);
+  console.log("hashObj", hashObj);
+
+  await fetch("http://localhost:5001/add_number", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: decodedHash
+  });
 
   const claim: EzklSecretPCDClaim = { hash };
   const proof: EzklSecretPCDProof = { clearSecret: args.secret.value };
