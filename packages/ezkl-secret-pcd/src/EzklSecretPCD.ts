@@ -20,7 +20,8 @@ function stringToFloat(str: string) {
 function unit8ArrayToJsonObect(uint8Array: Uint8Array) {
   // let string = new TextDecoder("utf-8").decode(uint8Array);
   let string = new TextDecoder().decode(uint8Array);
-  let jsonObject = JSON.parse(string);
+  let jsonObject = JSONBig.parse(string);
+  // let jsonObject = JSON.parse(string);
   return jsonObject;
 }
 
@@ -108,12 +109,15 @@ export async function prove(args: EzklSecretPCDArgs): Promise<EzklSecretPCD> {
   );
 
   const float = stringToFloat(args.secret.value);
+  console.log("==============================");
+  console.log("float", float);
+  // const float = 0.0;
 
   const floatToVecU64 = await getFloatToVecU64();
   if (!floatToVecU64) {
     throw new Error("Float to vec u64 not found");
   }
-  const u64Ser = floatToVecU64(float, 0);
+  const u64Ser = floatToVecU64(float, 7);
   const u64Output = unit8ArrayToJsonObect(new Uint8Array(u64Ser.buffer));
   const u64Array = [u64Output];
 
@@ -143,6 +147,66 @@ export async function prove(args: EzklSecretPCDArgs): Promise<EzklSecretPCD> {
 
   const claim: EzklSecretPCDClaim = { hash };
   const proof: EzklSecretPCDProof = { clearSecret: args.secret.value };
+
+  const HOST = "http://localhost:5001";
+  const ROUTE = "/public";
+  const url = `${HOST}${ROUTE}/`;
+
+  async function getVerify() {
+    try {
+      const module = await import("@ezkljs/engine/web/ezkl");
+      const verify = module.verify;
+      return verify;
+    } catch (err) {
+      console.error("Failed to import module:", err);
+    }
+  }
+
+  const verify = await getVerify();
+  if (!verify) {
+    throw new Error("Failed to import module verify");
+  }
+
+  // LOAD VK
+  // const vkResp = await fetch("/ezkl-artifacts/test.vk");
+  const vkResp = await fetch(url + "test.vk");
+  // console.log("after fetch vk");
+  if (!vkResp.ok) {
+    throw new Error("Failed to fetch test.vk");
+  }
+  const vkBuf = await vkResp.arrayBuffer();
+  const vk = new Uint8ClampedArray(vkBuf);
+  console.log("after vkBuf");
+
+  const settingsResp = await fetch(url + "settings.json");
+  if (!settingsResp.ok) {
+    throw new Error("Failed to fetch settings.json");
+  }
+  const settingsBuf = await settingsResp.arrayBuffer();
+  const settings = new Uint8ClampedArray(settingsBuf);
+
+  const srsResp = await fetch(url + "kzg.srs");
+  if (!srsResp.ok) {
+    throw new Error("Failed to fetch kzg.srs");
+  }
+  const srsBuf = await srsResp.arrayBuffer();
+  const srs = new Uint8ClampedArray(srsBuf);
+
+  const pfResp = await fetch(url + "test.pf");
+  if (!pfResp.ok) {
+    throw new Error("Failed to fetch test.pk");
+  }
+  const pfBuf = await pfResp.arrayBuffer();
+  const pf = new Uint8ClampedArray(pfBuf);
+
+  try {
+    const verified = await verify(pf, vk, settings, srs);
+    console.log("PF VERIFIED", verified);
+    // setVerified(verified);
+  } catch (err) {
+    // setVerified(false);
+    console.log("PF NOT VERIFIED", err);
+  }
 
   return new EzklSecretPCD(uuid(), claim, proof);
 }

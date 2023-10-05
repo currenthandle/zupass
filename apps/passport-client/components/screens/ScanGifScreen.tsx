@@ -55,6 +55,9 @@ async function getVerify() {
 
 // Scan a PCD QR code, then go to /verify to verify and display the proof.
 export function ScanGifScreen() {
+  const HOST = "http://localhost:5001";
+  const ROUTE = "/public";
+  const url = `${HOST}${ROUTE}/`;
   // const nav = useNavigate();
   const [scans, setScans] = useState<string[]>([]);
   const [scanned, setScanned] = useState(false);
@@ -115,7 +118,8 @@ export function ScanGifScreen() {
       }
 
       // LOAD VK
-      const vkResp = await fetch("/ezkl-artifacts/test.vk");
+      // const vkResp = await fetch("/ezkl-artifacts/test.vk");
+      const vkResp = await fetch(url + "test.vk");
       // console.log("after fetch vk");
       if (!vkResp.ok) {
         throw new Error("Failed to fetch test.vk");
@@ -124,14 +128,16 @@ export function ScanGifScreen() {
       const vk = new Uint8ClampedArray(vkBuf);
       console.log("after vkBuf");
 
-      const settingsResp = await fetch("/ezkl-artifacts/settings.json");
+      // const settingsResp = await fetch("/ezkl-artifacts/settings.json");
+      const settingsResp = await fetch(url + "settings.json");
       if (!settingsResp.ok) {
         throw new Error("Failed to fetch settings.json");
       }
       const settingsBuf = await settingsResp.arrayBuffer();
       const settings = new Uint8ClampedArray(settingsBuf);
 
-      const srsResp = await fetch("/ezkl-artifacts/kzg.srs");
+      // const srsResp = await fetch("/ezkl-artifacts/kzg.srs");
+      const srsResp = await fetch(url + "kzg.srs");
       if (!srsResp.ok) {
         throw new Error("Failed to fetch kzg.srs");
       }

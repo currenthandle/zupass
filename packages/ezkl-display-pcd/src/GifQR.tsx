@@ -123,7 +123,7 @@ export default function GifQR({ proof }: { proof: Uint8Array }) {
       chunks.push(str.slice(index, index + chunkSize));
       index += chunkSize;
     }
-    console.log("chunks.length", chunks.length);
+    // console.log("chunks.length", chunks.length);
     return chunks;
   }
   const tick = useRef<NodeJS.Timeout | number | null>(null);
@@ -150,30 +150,13 @@ export default function GifQR({ proof }: { proof: Uint8Array }) {
 
   useEffect(() => {
     // const hexProof = decToBaseN(proof, 62);
-    console.log("proof", proof);
     // const proof = new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8, 9]);
 
     const compressedProof = gzip(proof, { level: 9 });
     const encodedProof = uint8ClampedArrayToBase64(compressedProof);
-    console.log("encodedProof", encodedProof);
 
     const decodedProof = base64ToUint8ClampedArray(encodedProof);
     const uncompressedProof = ungzip(decodedProof);
-    console.log("====================================");
-    console.log("====================================");
-    console.log("====================================");
-    console.log("====================================");
-    console.log("====================================");
-    console.log("====================================");
-    console.log(areUint8ClampedArraysEqual(proof, uncompressedProof));
-    console.log("====================================");
-    console.log("====================================");
-    console.log("====================================");
-    console.log("====================================");
-    console.log("====================================");
-    console.log("====================================");
-
-    console.log("encodedProof", encodedProof);
     // console.log("proof", proof);
     // console.log("decodedProof", decodedProof);
 
