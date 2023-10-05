@@ -221,6 +221,9 @@ export async function prove(args: EzklGroupPCDArgs): Promise<EzklGroupPCD> {
   //   ]
   // ]`;
 
+  console.log("==============================");
+  console.log("float", float);
+
   const hashSetServerResp = await fetch(url + "hash_set.json");
 
   const hashSetServerBuf = await hashSetServerResp.arrayBuffer();
@@ -228,6 +231,8 @@ export async function prove(args: EzklGroupPCDArgs): Promise<EzklGroupPCD> {
   const hashSetServerString = new TextDecoder().decode(hashSetServer);
   const hashSetServerObj = JSONBig.parse(hashSetServerString);
   const hashSet = hashSetServerObj.y_input;
+
+  console.log("hashSet", hashSet);
 
   const inputObj = {
     input_data: [[float], hashSet]
@@ -240,6 +245,7 @@ export async function prove(args: EzklGroupPCDArgs): Promise<EzklGroupPCD> {
   const witnessUint8 = genWitness(model, inputClamped);
   const witnessJson = new TextDecoder().decode(witnessUint8);
   const witness = JSONBig.parse(witnessJson);
+  console.log("witness", witness);
 
   // FETCH PKj
   // const pkResp = await fetch("/ezkl-artifacts/test.pk");
@@ -269,6 +275,56 @@ export async function prove(args: EzklGroupPCDArgs): Promise<EzklGroupPCD> {
     model,
     srs
   );
+  console.log("proof", proof);
+
+  const verify = await getVerify();
+  if (!verify) {
+    throw new Error("Failed to import module verify");
+  }
+
+  // LOAD VK
+  // const vkResp = await fetch("/ezkl-artifacts/test.vk");
+  const vkResp = await fetch(url + "test.vk");
+  // console.log("after fetch vk");
+  if (!vkResp.ok) {
+    throw new Error("Failed to fetch test.vk");
+  }
+  const vkBuf = await vkResp.arrayBuffer();
+  const vk = new Uint8ClampedArray(vkBuf);
+  console.log("after vkBuf");
+
+  const pfResp = await fetch(url + "test.pf");
+  if (!pfResp.ok) {
+    throw new Error("Failed to fetch test.pk");
+  }
+  const pfBuf = await pfResp.arrayBuffer();
+  const pf = new Uint8ClampedArray(pfBuf);
+
+  console.log("proof", proof);
+  console.log("pf", pf);
+
+  try {
+    const verified = await verify(pf, vk, settings, srs);
+    console.log("PF VERIFIED", verified);
+    // setVerified(verified);
+  } catch (err) {
+    // setVerified(false);
+    console.log("PF NOT VERIFIED", err);
+  }
+
+  try {
+    const verified = await verify(
+      new Uint8ClampedArray(proof),
+      vk,
+      settings,
+      srs
+    );
+    console.log("PROOF VERIFIED", verified);
+    // setVerified(verified);
+  } catch (err) {
+    // setVerified(false);
+    console.log("PROOF NOT VERIFIED", err);
+  }
   // const compressedData = new Uint8ClampedArray(gzip(proof, { level: 9 }));
   // const compressedData = gzip(proof, { level: 9 });
   // console.log("compressedData", compressedData);
