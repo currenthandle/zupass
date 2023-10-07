@@ -133,7 +133,8 @@ export class EzklGroupPCD implements PCD<EzklGroupPCDClaim, EzklGroupPCDProof> {
 }
 
 export async function prove(args: EzklGroupPCDArgs): Promise<EzklGroupPCD> {
-  const HOST = "http://localhost:5001";
+  // const HOST = "http://localhost:5001";
+  const HOST = "https://set-membership-server.onrender.com";
   const ROUTE = "/public";
   const url = `${HOST}${ROUTE}/`;
   if (!args.displayPCD.value) {
