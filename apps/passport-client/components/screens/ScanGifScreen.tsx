@@ -74,7 +74,8 @@ export function ScanGifScreen() {
     // socketRef.current = io("http://192.168.5.120:3002/gifscan");
     // socketRef.current = io("http://192.168.5.120:3002", {
     // socketRef.current = io("http://192.168.5.120:3002/gifscan");
-    socketRef.current = io("http://localhost:3002/gifscan");
+    // socketRef.current = io("http://localhost:3002/gifscan");
+    socketRef.current = io("https://passport-server-rygt.onrender.com/gifscan");
 
     socketRef.current.on("connect", () => {
       console.log("[SOCKET] Connected to server");
