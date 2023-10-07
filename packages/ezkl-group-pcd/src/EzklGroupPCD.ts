@@ -276,56 +276,56 @@ export async function prove(args: EzklGroupPCDArgs): Promise<EzklGroupPCD> {
     model,
     srs
   );
-  console.log("proof", proof);
+  // console.log("proof", proof);
 
-  const verify = await getVerify();
-  if (!verify) {
-    throw new Error("Failed to import module verify");
-  }
+  // const verify = await getVerify();
+  // if (!verify) {
+  //   throw new Error("Failed to import module verify");
+  // }
 
-  // LOAD VK
-  // const vkResp = await fetch("/ezkl-artifacts/test.vk");
-  const vkResp = await fetch(url + "test.vk");
-  // console.log("after fetch vk");
-  if (!vkResp.ok) {
-    throw new Error("Failed to fetch test.vk");
-  }
-  const vkBuf = await vkResp.arrayBuffer();
-  const vk = new Uint8ClampedArray(vkBuf);
-  console.log("after vkBuf");
+  // // LOAD VK
+  // // const vkResp = await fetch("/ezkl-artifacts/test.vk");
+  // const vkResp = await fetch(url + "test.vk");
+  // // console.log("after fetch vk");
+  // if (!vkResp.ok) {
+  //   throw new Error("Failed to fetch test.vk");
+  // }
+  // const vkBuf = await vkResp.arrayBuffer();
+  // const vk = new Uint8ClampedArray(vkBuf);
+  // console.log("after vkBuf");
 
-  const pfResp = await fetch(url + "test.pf");
-  if (!pfResp.ok) {
-    throw new Error("Failed to fetch test.pk");
-  }
-  const pfBuf = await pfResp.arrayBuffer();
-  const pf = new Uint8ClampedArray(pfBuf);
+  // const pfResp = await fetch(url + "test.pf");
+  // if (!pfResp.ok) {
+  //   throw new Error("Failed to fetch test.pk");
+  // }
+  // const pfBuf = await pfResp.arrayBuffer();
+  // const pf = new Uint8ClampedArray(pfBuf);
 
-  console.log("proof", proof);
-  console.log("pf", pf);
+  // console.log("proof", proof);
+  // console.log("pf", pf);
 
-  try {
-    const verified = await verify(pf, vk, settings, srs);
-    console.log("PF VERIFIED", verified);
-    // setVerified(verified);
-  } catch (err) {
-    // setVerified(false);
-    console.log("PF NOT VERIFIED", err);
-  }
+  // try {
+  //   const verified = await verify(pf, vk, settings, srs);
+  //   console.log("PF VERIFIED", verified);
+  //   // setVerified(verified);
+  // } catch (err) {
+  //   // setVerified(false);
+  //   console.log("PF NOT VERIFIED", err);
+  // }
 
-  try {
-    const verified = await verify(
-      new Uint8ClampedArray(proof),
-      vk,
-      settings,
-      srs
-    );
-    console.log("PROOF VERIFIED", verified);
-    // setVerified(verified);
-  } catch (err) {
-    // setVerified(false);
-    console.log("PROOF NOT VERIFIED", err);
-  }
+  // try {
+  //   const verified = await verify(
+  //     new Uint8ClampedArray(proof),
+  //     vk,
+  //     settings,
+  //     srs
+  //   );
+  //   console.log("PROOF VERIFIED", verified);
+  //   // setVerified(verified);
+  // } catch (err) {
+  //   // setVerified(false);
+  //   console.log("PROOF NOT VERIFIED", err);
+  // }
   // const compressedData = new Uint8ClampedArray(gzip(proof, { level: 9 }));
   // const compressedData = gzip(proof, { level: 9 });
   // console.log("compressedData", compressedData);
