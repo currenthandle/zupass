@@ -55,7 +55,8 @@ async function getVerify() {
 
 // Scan a PCD QR code, then go to /verify to verify and display the proof.
 export function ScanGifScreen() {
-  const HOST = "http://localhost:5001";
+  // const HOST = "http://localhost:5001";
+  const HOST = "https://set-membership-server.onrender.com";
   const ROUTE = "/public";
   const url = `${HOST}${ROUTE}/`;
   // const nav = useNavigate();
