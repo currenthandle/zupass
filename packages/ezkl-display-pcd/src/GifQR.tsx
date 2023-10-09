@@ -152,11 +152,21 @@ export default function GifQR({ proof }: { proof: Uint8Array }) {
     // const hexProof = decToBaseN(proof, 62);
     // const proof = new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8, 9]);
 
-    const compressedProof = gzip(proof, { level: 9 });
+    const proofString = new TextDecoder().decode(proof);
+
+    const proofObject = JSONbig.parse(proofString);
+    // console.log("proofObject", proofObject);
+    proofObject.protocol = null;
+
+    const proofWithNullProtocol = new TextEncoder().encode(
+      JSONbig.stringify(proofObject)
+    );
+
+    const compressedProof = gzip(proofWithNullProtocol, { level: 9 });
     const encodedProof = uint8ClampedArrayToBase64(compressedProof);
 
-    const decodedProof = base64ToUint8ClampedArray(encodedProof);
-    const uncompressedProof = ungzip(decodedProof);
+    // const decodedProof = base64ToUint8ClampedArray(encodedProof);
+    // const uncompressedProof = ungzip(decodedProof);
     // console.log("proof", proof);
     // console.log("decodedProof", decodedProof);
 
