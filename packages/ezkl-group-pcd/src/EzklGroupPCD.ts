@@ -8,9 +8,10 @@ import {
 import JSONBig from "json-bigint";
 import { v4 as uuid } from "uuid";
 
-import { module, helpers } from "@pcd/ezkl-lib";
+import { module, helpers, constants } from "@pcd/ezkl-lib";
 const { stringToFloat } = helpers;
 const { getGenWitness, getProve, getInit } = module;
+const { SET_SERVER_DOMAIN, WASM_PATH } = constants;
 
 export const EzklGroupPCDTypeName = "ezkl-group-pcd";
 
@@ -49,9 +50,9 @@ export class EzklGroupPCD implements PCD<EzklGroupPCDClaim, EzklGroupPCDProof> {
 }
 
 export async function prove(args: EzklGroupPCDArgs): Promise<EzklGroupPCD> {
-  const HOST = "https://set-membership-server.onrender.com";
+  // const HOST = "https://set-membership-server.onrender.com";
   const ROUTE = "/public";
-  const url = `${HOST}${ROUTE}/`;
+  const url = `${SET_SERVER_DOMAIN}${ROUTE}/`;
   if (!args.displayPCD.value) {
     throw new Error("Cannot make group proof: missing secret pcd");
   }
@@ -68,7 +69,7 @@ export async function prove(args: EzklGroupPCDArgs): Promise<EzklGroupPCD> {
     throw new Error("Failed to import module init");
   }
   await init(
-    "/ezkl-artifacts/ezkl_bg.wasm",
+    WASM_PATH,
     new WebAssembly.Memory({ initial: 20, maximum: 1024, shared: true })
   );
 
@@ -78,7 +79,6 @@ export async function prove(args: EzklGroupPCDArgs): Promise<EzklGroupPCD> {
   }
 
   // FETCH COMPILED MODEL
-  // const compiliedModelResp = await fetch("/ezkl-artifacts/network.compiled");
   const compiliedModelResp = await fetch(url + "network.compiled");
   if (!compiliedModelResp.ok) {
     throw new Error("Failed to fetch network.compiled");
@@ -87,13 +87,10 @@ export async function prove(args: EzklGroupPCDArgs): Promise<EzklGroupPCD> {
   const model = new Uint8ClampedArray(modelBuf);
 
   // FETCH SETTINGS
-  // const settingsResp = await fetch("/ezkl-artifacts/settings.json");
   const settingsResp = await fetch(url + "settings.json");
   if (!settingsResp.ok) {
     throw new Error("Failed to fetch settings.json");
   }
-  const settingsBuf = await settingsResp.arrayBuffer();
-  const settings = new Uint8ClampedArray(settingsBuf);
 
   const { clearSecret } = secretPCD.proof;
   const float = stringToFloat(clearSecret);

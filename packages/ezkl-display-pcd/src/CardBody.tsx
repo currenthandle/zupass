@@ -52,7 +52,7 @@ export function EzklDisplayCardBody({ pcd }: { pcd: EzklDisplayPCD }) {
   //   </Container>
   // );
   // console.log("DISPLAY CARD", groupPCD?.proof?.proof);
-  const decodedArray = new TextDecoder().decode(groupPCD?.proof?.proof);
+  // const decodedArray = new TextDecoder().decode(groupPCD?.proof?.proof);
   // console.log("DISPLAY CARD", decodedArray);
   return (
     <Container>
