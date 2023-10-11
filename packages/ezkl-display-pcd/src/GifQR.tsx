@@ -6,20 +6,14 @@ import io from "socket.io-client";
 import { gzip, ungzip } from "pako";
 import "setimmediate";
 
-import { module } from "@pcd/ezkl-lib";
-const {} = module;
-
-const CHUNK_SIZE = 400; // The max length for each chunk
-const FRAME_RATE = 200;
+import { constants } from "@pcd/ezkl-lib";
+const { CHUNK_SIZE, FRAME_RATE, PASSPORT_SERVER_DOMAIN } = constants;
 
 export default function GifQR({ proof }: { proof: Uint8Array }) {
   const socketRef = useRef<Socket | null>(null);
   const [skipChunks, setSkipChunks] = useState<Record<number, true>>({});
   useEffect(() => {
-    // socketRef.current = io("http://192.168.5.120:3002/gifscan");
-    // socketRef.current = io("http://192.168.5.120:3002", {
-    // socketRef.current = io("http://192.168.5.120:3002/gifscan");
-    socketRef.current = io("https://passport-server-rygt.onrender.com/gifscan");
+    socketRef.current = io(PASSPORT_SERVER_DOMAIN + "/gifscan");
 
     socketRef.current.on("connect", () => {
       console.log("[SOCKET] Connected to server");
