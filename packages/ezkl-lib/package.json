@@ -1,0 +1,26 @@
+{
+  "name": "@pcd/ezkl-lib",
+  "version": "0.6.2",
+  "license": "GPL-3.0-or-later",
+  "main": "./dist/index.js",
+  "types": "./src/index.ts",
+  "files": [
+    "./src/*",
+    "./dist/*",
+    "./README.md"
+  ],
+  "scripts": {
+    "lint": "eslint \"**/*.ts{,x}\"",
+    "build": "tsup src/index.ts",
+    "dev": "tsup src/index.ts --watch",
+    "typecheck": "yarn tsc --noEmit",
+    "prepublishOnly": "yarn build",
+    "clean": "rm -rf dist node_modules"
+  },
+  "dependencies": {
+    "json-bigint": "^1.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
