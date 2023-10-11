@@ -14,51 +14,7 @@ import { RingLoader } from "react-spinners";
 import { constants, helpers, module } from "@pcd/ezkl-lib";
 const { getInit, getVerify } = module;
 const { base64ToUint8ClampedArray } = helpers;
-const { PASSPORT_SERVER_DOMAIN, SET_SERVER_DOMAIN } = constants;
-
-// const { CHUNK_SIZE, FRAME_RATE, PASSPORT_SERVER_DOMAIN } = helpers;
-
-// function uint8ClampedArrayToString(data: Uint8Array): string {
-//   return String.fromCharCode.apply(null, Array.from(data)) as string;
-// }
-
-// function stringToUint8ClampedArray(str: string): Uint8Array {
-//   const buffer = new Uint8Array(str.length);
-//   for (let i = 0; i < str.length; i++) {
-//     buffer[i] = str.charCodeAt(i);
-//   }
-//   return buffer;
-// }
-
-// function uint8ClampedArrayToBase64(data: Uint8Array): string {
-//   const str = uint8ClampedArrayToString(data);
-//   return btoa(str);
-// }
-
-// function base64ToUint8ClampedArray(base64: string): Uint8Array {
-//   const str = atob(base64);
-//   return stringToUint8ClampedArray(str);
-// }
-
-// async function getInit() {
-//   try {
-//     const module = await import("@ezkljs/engine/web/ezkl");
-//     const init = module.default;
-//     return init;
-//   } catch (err) {
-//     console.error("Failed to import module:", err);
-//   }
-// }
-
-// async function getVerify() {
-//   try {
-//     const module = await import("@ezkljs/engine/web/ezkl");
-//     const verify = module.verify;
-//     return verify;
-//   } catch (err) {
-//     console.error("Failed to import module:", err);
-//   }
-// }
+const { PASSPORT_SERVER_DOMAIN, SET_SERVER_DOMAIN, WASM_PATH } = constants;
 
 // Scan a PCD QR code, then go to /verify to verify and display the proof.
 export function ScanGifScreen() {
@@ -75,13 +31,7 @@ export function ScanGifScreen() {
 
   const [verified, setVerified] = useState<boolean | null>(null);
 
-  // const timer = useRef<NodeJS.Timeout | null>(null);
-
   useEffect(() => {
-    // socketRef.current = io("http://192.168.5.120:3002/gifscan");
-    // socketRef.current = io("http://192.168.5.120:3002", {
-    // socketRef.current = io("http://192.168.5.120:3002/gifscan");
-    // socketRef.current = io("http://localhost:3002/gifscan");
     socketRef.current = io(PASSPORT_SERVER_DOMAIN);
 
     socketRef.current.on("connect", () => {
@@ -103,12 +53,6 @@ export function ScanGifScreen() {
   }, []);
 
   useEffect(() => {
-    // console.log("numFrames > 0", numFrames > 0);
-    // console.log("numFrames === scans.length", numFrames === scans.length);
-    // console.log(
-    //   "scans.every((scan) => scan && scan.length > 0)",
-    //   scans.every((scan) => scan && scan.length > 0)
-    // );
     if (numFrames > 0 && numFrames === scans.length) {
       for (let i = 0; i < numFrames; i++) {
         if (!scans[i]) {
@@ -127,17 +71,14 @@ export function ScanGifScreen() {
       }
 
       // LOAD VK
-      // const vkResp = await fetch("/ezkl-artifacts/test.vk");
       const vkResp = await fetch(url + "test.vk");
-      // console.log("after fetch vk");
       if (!vkResp.ok) {
         throw new Error("Failed to fetch test.vk");
       }
       const vkBuf = await vkResp.arrayBuffer();
       const vk = new Uint8ClampedArray(vkBuf);
-      console.log("after vkBuf");
 
-      // const settingsResp = await fetch("/ezkl-artifacts/settings.json");
+      // LOAD SETTINGS
       const settingsResp = await fetch(url + "settings.json");
       if (!settingsResp.ok) {
         throw new Error("Failed to fetch settings.json");
@@ -145,7 +86,7 @@ export function ScanGifScreen() {
       const settingsBuf = await settingsResp.arrayBuffer();
       const settings = new Uint8ClampedArray(settingsBuf);
 
-      // const srsResp = await fetch("/ezkl-artifacts/kzg.srs");
+      // LOAD SRS
       const srsResp = await fetch(url + "kzg.srs");
       if (!srsResp.ok) {
         throw new Error("Failed to fetch kzg.srs");
@@ -153,19 +94,10 @@ export function ScanGifScreen() {
       const srsBuf = await srsResp.arrayBuffer();
       const srs = new Uint8ClampedArray(srsBuf);
 
-      // const testPFResp = await fetch("/ezkl-artifacts/test.pf");
-      // const testPF = new Uint8ClampedArray(await testPFResp.arrayBuffer());
-
-      // const testPFResp = await fetch("/ezkl-artifacts/test.pf");
-      // const testPF = new Uint8ClampedArray(await testPFResp.arrayBuffer());
       const aggScan = scans.join("");
-      // console.log("scans", scans);
-      // console.log("aggScan", aggScan);
 
       const decodedProof = base64ToUint8ClampedArray(aggScan);
       const uncompressedProof = ungzip(decodedProof);
-
-      console.log("proof", uncompressedProof);
 
       const init = await getInit();
 
@@ -173,23 +105,20 @@ export function ScanGifScreen() {
         throw new Error("Failed to import module init");
       }
       await init(
-        "/ezkl-artifacts/ezkl_bg.wasm",
+        WASM_PATH,
         new WebAssembly.Memory({ initial: 20, maximum: 1024, shared: true })
       );
 
       try {
         const verified = await verify(
           new Uint8ClampedArray(uncompressedProof),
-          // testPF,
           vk,
           settings,
           srs
         );
-        console.log("VERIFIED", verified);
         setVerified(verified);
       } catch (err) {
         setVerified(false);
-        console.log("NOT VERIFIED", err);
       }
     })();
   }
