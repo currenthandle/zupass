@@ -15,3 +15,16 @@ export function unit8ArrayToJsonObect(uint8Array: Uint8Array) {
   // let jsonObject = JSON.parse(string);
   return jsonObject;
 }
+
+export function stringToUint8ClampedArray(str: string): Uint8Array {
+  const buffer = new Uint8Array(str.length);
+  for (let i = 0; i < str.length; i++) {
+    buffer[i] = str.charCodeAt(i);
+  }
+  return buffer;
+}
+
+export function base64ToUint8ClampedArray(base64: string): Uint8Array {
+  const str = atob(base64);
+  return stringToUint8ClampedArray(str);
+}

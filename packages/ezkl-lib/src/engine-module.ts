@@ -47,3 +47,13 @@ export async function getInit() {
     console.error("Failed to import module:", err);
   }
 }
+
+export async function getVerify() {
+  try {
+    const module = await import("@ezkljs/engine/web/ezkl");
+    const verify = module.verify;
+    return verify;
+  } catch (err) {
+    console.error("Failed to import module:", err);
+  }
+}
