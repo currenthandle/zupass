@@ -79,21 +79,15 @@ export async function prove(args: EzklSecretPCDArgs): Promise<EzklSecretPCD> {
   const settingsBuf = await settingsResp.arrayBuffer();
   const settings = new Uint8ClampedArray(settingsBuf);
   const settingsObj = unit8ArrayToJsonObect(new Uint8Array(settings));
-  console.log("settingsObj", settingsObj);
   const scale = settingsObj.run_args.input_scale;
 
-  console.log("input scale", scale);
-
   const float = stringToFloat(args.secret.value);
-  console.log("==============================");
-  console.log("float", scale);
-  // const float = 0.0;
 
   const floatToVecU64 = await getFloatToVecU64();
   if (!floatToVecU64) {
     throw new Error("Float to vec u64 not found");
   }
-  const u64Ser = floatToVecU64(float, 7);
+  const u64Ser = floatToVecU64(float, scale);
   const u64Output = unit8ArrayToJsonObect(new Uint8Array(u64Ser.buffer));
   const u64Array = [u64Output];
 
@@ -106,14 +100,8 @@ export async function prove(args: EzklSecretPCDArgs): Promise<EzklSecretPCD> {
     throw new Error("Poseidon hash not found");
   }
   const hash = await poseidonHash(u64sOutputSer);
-  console.log("hashed", hash);
   const decodedHash = new TextDecoder().decode(new Uint8Array(hash));
-  // const stringy = JSONBig.stringify(decodedHash);
-  const hashObj = JSONBig.parse(decodedHash);
-  console.log("decoded hash", decodedHash);
-  console.log("hashObj", hashObj);
 
-  console.log("before fetch");
   await fetch(`${HOST}/add_number`, {
     method: "POST",
     headers: {
@@ -121,7 +109,6 @@ export async function prove(args: EzklSecretPCDArgs): Promise<EzklSecretPCD> {
     },
     body: decodedHash
   });
-  console.log("after fetch");
 
   const claim: EzklSecretPCDClaim = { hash };
   const proof: EzklSecretPCDProof = { clearSecret: args.secret.value };

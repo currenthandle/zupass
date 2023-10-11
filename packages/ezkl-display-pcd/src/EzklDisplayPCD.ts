@@ -37,14 +37,6 @@ export interface EzklDisplayPCDClaim {
 
 // stuff i need to call prove on EzklGroupPCD
 export interface EzklDisplayPCDProof {
-  // pk: Uint8ClampedArray;
-  // model: Uint8ClampedArray;
-  // settings: Uint8ClampedArray;
-  // witness: Uint8ClampedArray;
-  // pk: Uint8ClampedArray;
-  // model: Uint8ClampedArray;
-  // settings: Uint8ClampedArray;
-  // srs: Uint8ClampedArray;
   secretPCD: EzklSecretPCD;
 }
 
@@ -67,7 +59,6 @@ export class EzklDisplayPCD
   }
 }
 
-//userProvided: true
 export async function prove(args: EzklDisplayPCDArgs): Promise<EzklDisplayPCD> {
   if (!args.secretPCD.value) {
     throw new Error("Cannot make group proof: missing secret pcd");
