@@ -21,6 +21,7 @@
   "dependencies": {
     "@pcd/ezkl-group-pcd": "*",
     "@pcd/ezkl-secret-pcd": "*",
+    "@pcd/ezkl-lib": "*",
     "@pcd/passport-ui": "0.6.2",
     "@pcd/pcd-types": "0.6.3",
     "js-sha256": "^0.9.0",

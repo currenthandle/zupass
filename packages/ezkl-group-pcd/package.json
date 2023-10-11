@@ -19,6 +19,7 @@
     "clean": "rm -rf dist node_modules"
   },
   "dependencies": {
+    "ezkl-lib": "*",
     "@pcd/ezkl-secret-pcd": "*",
     "@pcd/passport-ui": "0.6.2",
     "@pcd/pcd-types": "0.6.3",

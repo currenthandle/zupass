@@ -6,6 +6,9 @@ import io from "socket.io-client";
 import { gzip, ungzip } from "pako";
 import "setimmediate";
 
+import { module } from "@pcd/ezkl-lib";
+const {} = module;
+
 const CHUNK_SIZE = 400; // The max length for each chunk
 const FRAME_RATE = 200;
 

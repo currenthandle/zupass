@@ -9,51 +9,10 @@ import JSONBig from "json-bigint";
 import { v4 as uuid } from "uuid";
 import { EzklSecretCardBody } from "./CardBody";
 
-function stringToFloat(str: string) {
-  let result = "";
-  for (let i = 0; i < str.length; i++) {
-    result += str.charCodeAt(i).toString();
-  }
-  return parseFloat(result);
-}
+import { module, helpers } from "@pcd/ezkl-lib";
+const { stringToFloat, unit8ArrayToJsonObect } = helpers;
+const { getFloatToVecU64, getPoseidonHash, getInit } = module;
 
-function unit8ArrayToJsonObect(uint8Array: Uint8Array) {
-  // let string = new TextDecoder("utf-8").decode(uint8Array);
-  let string = new TextDecoder().decode(uint8Array);
-  let jsonObject = JSONBig.parse(string);
-  // let jsonObject = JSON.parse(string);
-  return jsonObject;
-}
-
-async function getFloatToVecU64() {
-  try {
-    const module = await import("@ezkljs/engine/web/ezkl");
-    const floatToVecU64 = module.floatToVecU64;
-    return floatToVecU64;
-  } catch (err) {
-    console.error("Failed to import module:", err);
-  }
-}
-
-async function getPoseidonHash() {
-  try {
-    const module = await import("@ezkljs/engine/web/ezkl");
-    const poseidonHash = module.poseidonHash;
-    return poseidonHash;
-  } catch (err) {
-    console.error("Failed to import module:", err);
-  }
-}
-
-async function getInit() {
-  try {
-    const module = await import("@ezkljs/engine/web/ezkl");
-    const init = module.default;
-    return init;
-  } catch (err) {
-    console.error("Failed to import module:", err);
-  }
-}
 export const EzklSecretPCDTypeName = "ezkl-secret-pcd";
 
 // all fields in Args need to conform to interface Argument from pcd.ts
