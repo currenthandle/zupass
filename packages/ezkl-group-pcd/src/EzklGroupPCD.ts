@@ -49,7 +49,6 @@ export class EzklGroupPCD implements PCD<EzklGroupPCDClaim, EzklGroupPCDProof> {
 }
 
 export async function prove(args: EzklGroupPCDArgs): Promise<EzklGroupPCD> {
-  // const HOST = "http://localhost:5001";
   const HOST = "https://set-membership-server.onrender.com";
   const ROUTE = "/public";
   const url = `${HOST}${ROUTE}/`;
@@ -99,48 +98,6 @@ export async function prove(args: EzklGroupPCDArgs): Promise<EzklGroupPCD> {
   const { clearSecret } = secretPCD.proof;
   const float = stringToFloat(clearSecret);
 
-  // const hashedSet = `[
-  //   [
-  //     4572534320476584198, 16569434655355399807, 2934216378187574526,
-  //     407414070347714353
-  //   ],
-  //   [
-  //     9076552887107963406, 5988095838945484945, 9199181261850001878,
-  //     632050959657341670
-  //   ],
-  //   [
-  //     12305608786227911750, 9903581919532927302, 2907727335548365623,
-  //     737630934569201951
-  //   ],
-  //   [
-  //     5236164246842610752, 7116161584353376787, 5863925054592117601,
-  //     1720486879953014270
-  //   ],
-  //   [
-  //     8705747727513110919, 8368749124085643527, 1768788280531912488,
-  //     2785003347918012818
-  //   ],
-  //   [
-  //     11098220056660419283, 5728214177482673336, 17470378912069676664,
-  //     2311452660145672176
-  //   ],
-  //   [
-  //     7370671970298444243, 11290245180410780212, 15962375296642530508,
-  //     1372135491719419450
-  //   ],
-  //   [
-  //     12817781970450193072, 17513085767882081417, 8221563647785859506,
-  //     2500146335159376594
-  //   ],
-  //   [
-  //     3246365869747041386, 17437817983640603683, 6502307365827494142,
-  //     73616177511686234
-  //   ]
-  // ]`;
-
-  console.log("==============================");
-  console.log("float", float);
-
   const hashSetServerResp = await fetch(url + "hash_set.json");
 
   const hashSetServerBuf = await hashSetServerResp.arrayBuffer();
@@ -148,8 +105,6 @@ export async function prove(args: EzklGroupPCDArgs): Promise<EzklGroupPCD> {
   const hashSetServerString = new TextDecoder().decode(hashSetServer);
   const hashSetServerObj = JSONBig.parse(hashSetServerString);
   const hashSet = hashSetServerObj.y_input;
-
-  console.log("hashSet", hashSet);
 
   const inputObj = {
     input_data: [[float], hashSet]
@@ -160,9 +115,6 @@ export async function prove(args: EzklGroupPCDArgs): Promise<EzklGroupPCD> {
   const inputClamped = new Uint8ClampedArray(encodeInputBuf);
 
   const witnessUint8 = genWitness(model, inputClamped);
-  const witnessJson = new TextDecoder().decode(witnessUint8);
-  const witness = JSONBig.parse(witnessJson);
-  console.log("witness", witness);
 
   // FETCH PKj
   // const pkResp = await fetch("/ezkl-artifacts/test.pk");
@@ -192,105 +144,6 @@ export async function prove(args: EzklGroupPCDArgs): Promise<EzklGroupPCD> {
     model,
     srs
   );
-  // console.log("proof", proof);
-
-  // const verify = await getVerify();
-  // if (!verify) {
-  //   throw new Error("Failed to import module verify");
-  // }
-
-  // // LOAD VK
-  // // const vkResp = await fetch("/ezkl-artifacts/test.vk");
-  // const vkResp = await fetch(url + "test.vk");
-  // // console.log("after fetch vk");
-  // if (!vkResp.ok) {
-  //   throw new Error("Failed to fetch test.vk");
-  // }
-  // const vkBuf = await vkResp.arrayBuffer();
-  // const vk = new Uint8ClampedArray(vkBuf);
-  // console.log("after vkBuf");
-
-  // const pfResp = await fetch(url + "test.pf");
-  // if (!pfResp.ok) {
-  //   throw new Error("Failed to fetch test.pk");
-  // }
-  // const pfBuf = await pfResp.arrayBuffer();
-  // const pf = new Uint8ClampedArray(pfBuf);
-
-  // console.log("proof", proof);
-  // console.log("pf", pf);
-
-  // try {
-  //   const verified = await verify(pf, vk, settings, srs);
-  //   console.log("PF VERIFIED", verified);
-  //   // setVerified(verified);
-  // } catch (err) {
-  //   // setVerified(false);
-  //   console.log("PF NOT VERIFIED", err);
-  // }
-
-  // try {
-  //   const verified = await verify(
-  //     new Uint8ClampedArray(proof),
-  //     vk,
-  //     settings,
-  //     srs
-  //   );
-  //   console.log("PROOF VERIFIED", verified);
-  //   // setVerified(verified);
-  // } catch (err) {
-  //   // setVerified(false);
-  //   console.log("PROOF NOT VERIFIED", err);
-  // }
-  // const compressedData = new Uint8ClampedArray(gzip(proof, { level: 9 }));
-  // const compressedData = gzip(proof, { level: 9 });
-  // console.log("compressedData", compressedData);
-
-  // console.log("proof as json string", JSONBig.stringify(proof));
-
-  // function convertDataToString(data: Uint8Array) {
-  //   let string = "";
-  //   for (let i = 0; i < data.length; i++) {
-  //     // string += String.fromCharCode(data[i]);
-  //     const elmToStr = data[i].toString();
-  //     if (elmToStr.length === 1) {
-  //       string += "00" + elmToStr;
-  //     } else if (elmToStr.length === 2) {
-  //       string += "0" + elmToStr;
-  //     } else {
-  //       string += elmToStr;
-  //     }
-  //   }
-  //   return string;
-  // }
-
-  // const dataStr = convertDataToString(proof);
-  // console.log("proof", proof);
-  // console.log("dataStr", dataStr);
-
-  // const verify = await getVerify();
-  // if (!verify) {
-  //   throw new Error("Failed to import module verify");
-  // }
-
-  // // LOAD VK
-  // const vkResp = await fetch("/ezkl-artifacts/test.vk");
-  // // console.log("after fetch vk");
-  // if (!vkResp.ok) {
-  //   throw new Error("Failed to fetch test.vk");
-  // }
-  // const vkBuf = await vkResp.arrayBuffer();
-  // const vk = new Uint8ClampedArray(vkBuf);
-  // console.log("after vkBuf");
-
-  // const testPFResp = await fetch("/ezkl-artifacts/test.pf");
-  // const testPF = new Uint8ClampedArray(await testPFResp.arrayBuffer());
-  // console.log("proof", proof);
-
-  // const verified = await verify(proof, vk, settings, srs);
-  // console.log("VERIFIED", verified);
-
-  // return new EzklGroupPCD(uuid(), { groupName: "GROUP1" }, { proof: dataStr });
   return new EzklGroupPCD(uuid(), { groupName: "GROUP1" }, { proof });
 }
 
