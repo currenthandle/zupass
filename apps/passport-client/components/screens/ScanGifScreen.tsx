@@ -14,7 +14,7 @@ import { RingLoader } from "react-spinners";
 import { constants, helpers, module } from "@pcd/ezkl-lib";
 const { getInit, getVerify } = module;
 const { base64ToUint8ClampedArray } = helpers;
-const { PASSPORT_SERVER_DOMAIN } = constants;
+const { PASSPORT_SERVER_DOMAIN, SET_SERVER_DOMAIN } = constants;
 
 // const { CHUNK_SIZE, FRAME_RATE, PASSPORT_SERVER_DOMAIN } = helpers;
 
@@ -63,7 +63,7 @@ const { PASSPORT_SERVER_DOMAIN } = constants;
 // Scan a PCD QR code, then go to /verify to verify and display the proof.
 export function ScanGifScreen() {
   // const HOST = "http://localhost:5001";
-  const HOST = PASSPORT_SERVER_DOMAIN;
+  const HOST = SET_SERVER_DOMAIN;
   const ROUTE = "/public";
   const url = `${HOST}${ROUTE}/`;
   // const nav = useNavigate();
