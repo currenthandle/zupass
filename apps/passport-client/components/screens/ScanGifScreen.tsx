@@ -11,52 +11,59 @@ import io from "socket.io-client";
 import { ungzip } from "pako";
 import { RingLoader } from "react-spinners";
 
+import { constants, helpers, module } from "@pcd/ezkl-lib";
+const { getInit, getVerify } = module;
+const { base64ToUint8ClampedArray } = helpers;
+const { PASSPORT_SERVER_DOMAIN } = constants;
+
+// const { CHUNK_SIZE, FRAME_RATE, PASSPORT_SERVER_DOMAIN } = helpers;
+
 // function uint8ClampedArrayToString(data: Uint8Array): string {
 //   return String.fromCharCode.apply(null, Array.from(data)) as string;
 // }
 
-function stringToUint8ClampedArray(str: string): Uint8Array {
-  const buffer = new Uint8Array(str.length);
-  for (let i = 0; i < str.length; i++) {
-    buffer[i] = str.charCodeAt(i);
-  }
-  return buffer;
-}
+// function stringToUint8ClampedArray(str: string): Uint8Array {
+//   const buffer = new Uint8Array(str.length);
+//   for (let i = 0; i < str.length; i++) {
+//     buffer[i] = str.charCodeAt(i);
+//   }
+//   return buffer;
+// }
 
 // function uint8ClampedArrayToBase64(data: Uint8Array): string {
 //   const str = uint8ClampedArrayToString(data);
 //   return btoa(str);
 // }
 
-function base64ToUint8ClampedArray(base64: string): Uint8Array {
-  const str = atob(base64);
-  return stringToUint8ClampedArray(str);
-}
+// function base64ToUint8ClampedArray(base64: string): Uint8Array {
+//   const str = atob(base64);
+//   return stringToUint8ClampedArray(str);
+// }
 
-async function getInit() {
-  try {
-    const module = await import("@ezkljs/engine/web/ezkl");
-    const init = module.default;
-    return init;
-  } catch (err) {
-    console.error("Failed to import module:", err);
-  }
-}
+// async function getInit() {
+//   try {
+//     const module = await import("@ezkljs/engine/web/ezkl");
+//     const init = module.default;
+//     return init;
+//   } catch (err) {
+//     console.error("Failed to import module:", err);
+//   }
+// }
 
-async function getVerify() {
-  try {
-    const module = await import("@ezkljs/engine/web/ezkl");
-    const verify = module.verify;
-    return verify;
-  } catch (err) {
-    console.error("Failed to import module:", err);
-  }
-}
+// async function getVerify() {
+//   try {
+//     const module = await import("@ezkljs/engine/web/ezkl");
+//     const verify = module.verify;
+//     return verify;
+//   } catch (err) {
+//     console.error("Failed to import module:", err);
+//   }
+// }
 
 // Scan a PCD QR code, then go to /verify to verify and display the proof.
 export function ScanGifScreen() {
   // const HOST = "http://localhost:5001";
-  const HOST = "https://set-membership-server.onrender.com";
+  const HOST = PASSPORT_SERVER_DOMAIN;
   const ROUTE = "/public";
   const url = `${HOST}${ROUTE}/`;
   // const nav = useNavigate();
@@ -75,7 +82,7 @@ export function ScanGifScreen() {
     // socketRef.current = io("http://192.168.5.120:3002", {
     // socketRef.current = io("http://192.168.5.120:3002/gifscan");
     // socketRef.current = io("http://localhost:3002/gifscan");
-    socketRef.current = io("https://passport-server-rygt.onrender.com/gifscan");
+    socketRef.current = io(PASSPORT_SERVER_DOMAIN);
 
     socketRef.current.on("connect", () => {
       console.log("[SOCKET] Connected to server");
@@ -152,8 +159,8 @@ export function ScanGifScreen() {
       // const testPFResp = await fetch("/ezkl-artifacts/test.pf");
       // const testPF = new Uint8ClampedArray(await testPFResp.arrayBuffer());
       const aggScan = scans.join("");
-      console.log("scans", scans);
-      console.log("aggScan", aggScan);
+      // console.log("scans", scans);
+      // console.log("aggScan", aggScan);
 
       const decodedProof = base64ToUint8ClampedArray(aggScan);
       const uncompressedProof = ungzip(decodedProof);
@@ -213,7 +220,7 @@ export function ScanGifScreen() {
               const id = parseInt(data.substring(0, 3), 10);
               const totalFrames = parseInt(data.substring(3, 6), 10);
               const chunkData = data.substring(6);
-              console.log("data", data);
+              // console.log("data", data);
 
               socketRef.current.emit("qrId", id);
 
