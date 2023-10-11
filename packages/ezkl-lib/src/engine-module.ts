@@ -8,6 +8,26 @@ export async function getFloatToVecU64() {
   }
 }
 
+export async function getGenWitness() {
+  try {
+    const module = await import("@ezkljs/engine/web/ezkl");
+    const genWitness = module.genWitness;
+    return genWitness;
+  } catch (err) {
+    console.error("Failed to import module:", err);
+  }
+}
+
+export async function getProve() {
+  try {
+    const module = await import("@ezkljs/engine/web/ezkl");
+    const init = module.prove;
+    return init;
+  } catch (err) {
+    console.error("Failed to import module:", err);
+  }
+}
+
 export async function getPoseidonHash() {
   try {
     const module = await import("@ezkljs/engine/web/ezkl");

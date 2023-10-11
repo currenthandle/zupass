@@ -12,74 +12,7 @@ import { EzklDisplayCardBody } from "./CardBody";
 
 import { EzklSecretPCD, EzklSecretPCDPackage } from "@pcd/ezkl-secret-pcd";
 
-// import { prove as ezklProve, verify as ezklVerify } from "@ezkljs/engine";
-
 import { v4 as uuid } from "uuid";
-
-function stringToFloat(str: string) {
-  let result = "";
-  for (let i = 0; i < str.length; i++) {
-    result += str.charCodeAt(i).toString();
-  }
-  return parseFloat(result);
-}
-
-function unit8ArrayToJsonObect(uint8Array: Uint8Array) {
-  // let string = new TextDecoder("utf-8").decode(uint8Array);
-  let string = new TextDecoder().decode(uint8Array);
-  let jsonObject = JSON.parse(string);
-  return jsonObject;
-}
-
-async function getInit() {
-  try {
-    const module = await import("@ezkljs/engine/web/ezkl");
-    const init = module.default;
-    return init;
-  } catch (err) {
-    console.error("Failed to import module:", err);
-  }
-}
-
-async function getProve() {
-  try {
-    const module = await import("@ezkljs/engine/web/ezkl");
-    const init = module.prove;
-    return init;
-  } catch (err) {
-    console.error("Failed to import module:", err);
-  }
-}
-
-async function getGenWitness() {
-  try {
-    const module = await import("@ezkljs/engine/web/ezkl");
-    const genWitness = module.genWitness;
-    return genWitness;
-  } catch (err) {
-    console.error("Failed to import module:", err);
-  }
-}
-
-async function getFloatToVecU64() {
-  try {
-    const module = await import("@ezkljs/engine/web/ezkl");
-    const floatToVecU64 = module.floatToVecU64;
-    return floatToVecU64;
-  } catch (err) {
-    console.error("Failed to import module:", err);
-  }
-}
-
-async function getPoseidonHash() {
-  try {
-    const module = await import("@ezkljs/engine/web/ezkl");
-    const poseidonHash = module.poseidonHash;
-    return poseidonHash;
-  } catch (err) {
-    console.error("Failed to import module:", err);
-  }
-}
 
 export const EzklDisplayPCDTypeName = "ezkl-display-pcd";
 
