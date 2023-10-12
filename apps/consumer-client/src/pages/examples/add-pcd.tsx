@@ -312,7 +312,7 @@ async function addEzklSecretProofPCD() {
     {
       secret: {
         argumentType: ArgumentTypeName.String,
-        value: undefined,
+        value: "secret",
         userProvided: true
       }
     },

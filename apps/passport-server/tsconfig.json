@@ -3,15 +3,11 @@
   "include": ["**/*.ts", "**/*.d.ts"],
   "exclude": ["node_modules"],
   "compilerOptions": {
-<<<<<<< HEAD
     "outDir": "./build",
     "noEmit": false,
     "target": "ES2022",
     "module": "commonjs",
     "inlineSourceMap": true,
-=======
-    "module": "CommonJS",
->>>>>>> c156286b (CommonJS (#600))
     "typeRoots": [
       "src/util/declarations/",
       "./node_modules/@types/",

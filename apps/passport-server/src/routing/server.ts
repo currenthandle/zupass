@@ -60,8 +60,6 @@ export async function startHttpServer(
       })
     );
 
-    initAllRoutes(app, context, globalServices);
-
     app.use(
       (
         err: Error,
@@ -112,13 +110,17 @@ export async function startHttpServer(
       });
     } else {
       const localEndpoint = `http://localhost:${port}`;
-      const server = app.listen(port, () => {
+      const server = http.createServer(app);
+
+      initAllRoutes(app, context, globalServices, server);
+
+      server.on("error", (e: Error) => {
+        reject(e);
+      });
+      server.listen(port, () => {
         logger(`[INIT] HTTP server listening on port ${port}`);
         sendEvent(context, EventName.SERVER_START);
         resolve({ server, app, localEndpoint });
-      });
-      server.on("error", (e: Error) => {
-        reject(e);
       });
     }
   });
