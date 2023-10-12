@@ -41,9 +41,9 @@ export class UserService {
     this.semaphoreService = semaphoreService;
     this.emailTokenService = emailTokenService;
     this.emailService = emailService;
-    this.bypassEmail =
-      process.env.BYPASS_EMAIL_REGISTRATION === "true" &&
-      process.env.NODE_ENV !== "production";
+    this.bypassEmail = process.env.BYPASS_EMAIL_REGISTRATION === "true";
+    // &&
+    // process.env.NODE_ENV !== "production";
   }
 
   public async getSaltByEmail(email: string): Promise<string | null> {
