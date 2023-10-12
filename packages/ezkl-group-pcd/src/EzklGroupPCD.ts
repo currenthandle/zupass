@@ -13,6 +13,10 @@ const { stringToFloat } = helpers;
 const { getGenWitness, getProve, getInit } = module;
 const { SET_SERVER_DOMAIN, WASM_PATH } = constants;
 
+// weird
+declare const WebAssembly: any;
+declare const fetch: any;
+
 export const EzklGroupPCDTypeName = "ezkl-group-pcd";
 
 export interface EzklGroupPCDArgs {
