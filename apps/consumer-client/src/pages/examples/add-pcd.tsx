@@ -280,7 +280,7 @@ function AddEthGroupPCDButton() {
 }
 
 async function addEzklDisplayProofPCD() {
-  const url = constructPassportPcdProveAndAddRequestUrl<
+  const url = constructZupassPcdProveAndAddRequestUrl<
     typeof EzklDisplayPCDPackage
   >(
     ZUPASS_URL,
@@ -299,11 +299,11 @@ async function addEzklDisplayProofPCD() {
     }
   );
 
-  sendPassportRequest(url);
+  sendZupassRequest(url);
 }
 
 async function addEzklSecretProofPCD() {
-  const url = constructPassportPcdProveAndAddRequestUrl<
+  const url = constructZupassPcdProveAndAddRequestUrl<
     typeof EzklSecretPCDPackage
   >(
     ZUPASS_URL,
@@ -321,7 +321,7 @@ async function addEzklSecretProofPCD() {
     }
   );
 
-  sendPassportRequest(url);
+  sendZupassRequest(url);
 }
 
 async function addGroupMembershipProofPCD() {
