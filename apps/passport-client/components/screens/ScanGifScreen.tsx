@@ -22,6 +22,7 @@ export function ScanGifScreen() {
   const HOST = SET_SERVER_DOMAIN;
   const ROUTE = "/public";
   const url = `${HOST}${ROUTE}/`;
+  const webSocketUrl = `${PASSPORT_SERVER_DOMAIN}/gifscan`;
   // const nav = useNavigate();
   const [scans, setScans] = useState<string[]>([]);
   const [scanned, setScanned] = useState(false);
@@ -32,10 +33,11 @@ export function ScanGifScreen() {
   const [verified, setVerified] = useState<boolean | null>(null);
 
   useEffect(() => {
-    socketRef.current = io(PASSPORT_SERVER_DOMAIN);
+    console.log("PASSPORT_SERVER_DOMAIN from scanner", webSocketUrl);
+    socketRef.current = io(webSocketUrl);
 
     socketRef.current.on("connect", () => {
-      console.log("[SOCKET] Connected to server");
+      console.log("[SOCKET] Connected to server", webSocketUrl);
     });
 
     socketRef.current.on("connect_error", (error) => {
@@ -50,7 +52,7 @@ export function ScanGifScreen() {
     return () => {
       socketRef.current.disconnect();
     };
-  }, []);
+  }, [webSocketUrl]);
 
   useEffect(() => {
     if (numFrames > 0 && numFrames === scans.length) {
