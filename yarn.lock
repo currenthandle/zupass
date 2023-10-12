@@ -1769,10 +1769,13 @@
     "@ethersproject/properties" "^5.7.0"
     "@ethersproject/strings" "^5.7.0"
 
-"@ezkljs/engine@2.2.2":
-  version "2.2.2"
-  resolved "https://registry.yarnpkg.com/@ezkljs/engine/-/engine-2.2.2.tgz#6f7f221689e6f17485c3ad982394d1915684c68f"
-  integrity sha512-Oh9HMLs7HGeyOSghQIDOSHJFzpvw/H+WsuWle3akNmRKItJDVaNVjd+vfvNfd4BitQ+hNqjf3101p0MZb7iGWA==
+"@ezkljs/engine@2.5.0":
+  version "2.5.0"
+  resolved "https://registry.yarnpkg.com/@ezkljs/engine/-/engine-2.5.0.tgz#8e415547b74522e129cb1b7c37179a7674dc5cf3"
+  integrity sha512-iLpI5KeVVIwsC78/1E1E1vc8cVxatzFARHtwk5aDRYVEf9LiQqDhQpRDqeIok1RKlKuCfuwOdFham6mB8xR1eQ==
+  dependencies:
+    "@types/json-bigint" "^1.0.1"
+    json-bigint "^1.0.0"
 
 "@fastify/busboy@^2.0.0":
   version "2.0.0"
