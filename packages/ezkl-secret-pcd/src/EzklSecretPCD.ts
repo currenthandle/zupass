@@ -14,10 +14,6 @@ const { stringToFloat, unit8ArrayToJsonObect } = helpers;
 const { getFloatToVecU64, getPoseidonHash, getInit } = module;
 const { SET_SERVER_DOMAIN, WASM_PATH } = constants;
 
-// weird
-declare const WebAssembly: any;
-declare const fetch: any;
-
 export const EzklSecretPCDTypeName = "ezkl-secret-pcd";
 
 // all fields in Args need to conform to interface Argument from pcd.ts

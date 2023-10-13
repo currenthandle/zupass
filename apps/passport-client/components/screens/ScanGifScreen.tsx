@@ -6,7 +6,7 @@ import { Spacer, TextCenter } from "../core";
 import { CircleButton } from "../core/Button";
 import { icons } from "../icons";
 import { AppContainer } from "../shared/AppContainer";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import io from "socket.io-client";
 import { ungzip } from "pako";
 import { RingLoader } from "react-spinners";
@@ -36,44 +36,54 @@ export function ScanGifScreen() {
   // const [socket, setSocket] = useState(null);
   const socketRef = useRef(null);
 
+  const [freshArtifacts, setFreshArtifacts] = useState({
+    vk: false,
+    // srs: false,
+    settings: false
+  });
+
   const [verified, setVerified] = useState<boolean | null>(null);
 
-  useEffect(() => {
-    (async function () {
-      const now = Date.now();
-      const timeout = 1000 * 60 * 10; // 10 minutes
-
-      // Check for VK
-      if (
-        Number(localStorage.getItem("vkSetTime")) + timeout <= now ||
-        !localStorage.getItem("vk")
-      ) {
-        const vk = await getVK(url);
-        localStorage.setItem("vk", clampedArrayToBase64String(vk));
-        localStorage.setItem("vkSetTime", Date.now().toString());
+  const getArtifacts = useCallback(
+    async (
+      refetch = {
+        vk: false,
+        // srs: false,
+        settings: false
       }
-
-      // Check for SRS
-      if (
-        Number(localStorage.getItem("srsSetTime")) + timeout <= now ||
-        !localStorage.getItem("srs")
-      ) {
+    ) => {
+      // Check for SRSk
+      if (!localStorage.getItem("srs")) {
         const srs = await getSRS(url);
         localStorage.setItem("srs", clampedArrayToBase64String(srs));
         localStorage.setItem("srsSetTime", Date.now().toString());
+        // setFreshArtifacts((prev) => ({ ...prev, srs: true }));
+      }
+
+      // Check for VK
+      if (!localStorage.getItem("vk") || refetch.vk) {
+        const vk = await getVK(url);
+        localStorage.setItem("vk", clampedArrayToBase64String(vk));
+        localStorage.setItem("vkSetTime", Date.now().toString());
+        setFreshArtifacts((prev) => ({ ...prev, vk: true }));
       }
 
       // Check for Settings
-      if (
-        Number(localStorage.getItem("settingsSetTime")) + timeout <= now ||
-        !localStorage.getItem("settings")
-      ) {
+      if (!localStorage.getItem("settings") || refetch.settings) {
         const settings = await getSettings(url);
         localStorage.setItem("settings", clampedArrayToBase64String(settings));
         localStorage.setItem("settingsSetTime", Date.now().toString());
+        setFreshArtifacts((prev) => ({ ...prev, settings: true }));
       }
+    },
+    [url]
+  ); // Assuming `url` is the only dependency for `getArtifacts`
+
+  useEffect(() => {
+    (async () => {
+      await getArtifacts();
     })();
-  }, [url]);
+  }, [getArtifacts]);
 
   useEffect(() => {
     console.log("PASSPORT_SERVER_DOMAIN from scanner", webSocketUrl);
@@ -110,7 +120,6 @@ export function ScanGifScreen() {
 
   if (scanned) {
     (async () => {
-      console.log("scanned!!!!");
       const verify = await getVerify();
       if (!verify) {
         throw new Error("Failed to import module verify");
@@ -139,7 +148,7 @@ export function ScanGifScreen() {
         localStorage.getItem("settings")
       );
 
-      try {
+      async function attemptVerify() {
         const verified = await verify(
           new Uint8ClampedArray(uncompressedProof),
           vk,
@@ -147,8 +156,28 @@ export function ScanGifScreen() {
           srs
         );
         setVerified(verified);
+      }
+
+      try {
+        await attemptVerify();
       } catch (err) {
-        setVerified(false);
+        if (!freshArtifacts.vk || !freshArtifacts.settings) {
+          console.log("not fresh");
+        } else {
+          console.log("fresh");
+        }
+        if (!freshArtifacts.vk && !freshArtifacts.settings) {
+          getArtifacts({ vk: true, settings: true });
+          await attemptVerify();
+        } else if (!freshArtifacts.vk) {
+          getArtifacts({ vk: true, settings: false });
+          await attemptVerify();
+        } else if (!freshArtifacts.settings) {
+          getArtifacts({ vk: false, settings: true });
+          await attemptVerify();
+        } else {
+          setVerified(false);
+        }
       }
     })();
   }
