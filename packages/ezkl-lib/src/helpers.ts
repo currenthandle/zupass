@@ -16,6 +16,32 @@ export function unit8ArrayToJsonObect(uint8Array: Uint8Array) {
   return jsonObject;
 }
 
+// export function clampedArrayToString(clampedArray: Uint8ClampedArray) {
+//   let string = new TextDecoder().decode(clampedArray);
+//   return string;
+// }
+
+// export function stringToClampedArray(str: string) {
+//   const buff = new TextEncoder().encode(str);
+//   return new Uint8ClampedArray(buff);
+// }
+
+export function clampedArrayToBase64String(clampedArray: Uint8ClampedArray) {
+  const binaryString = Array.from(clampedArray)
+    .map((byte) => String.fromCharCode(byte))
+    .join("");
+  return btoa(binaryString);
+}
+
+export function base64StringToClampedArray(base64: string) {
+  const binaryString = atob(base64);
+  const bytes = new Uint8ClampedArray(binaryString.length);
+  for (let i = 0; i < binaryString.length; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+  return bytes;
+}
+
 export function stringToUint8ClampedArray(str: string): Uint8Array {
   const buffer = new Uint8Array(str.length);
   for (let i = 0; i < str.length; i++) {
