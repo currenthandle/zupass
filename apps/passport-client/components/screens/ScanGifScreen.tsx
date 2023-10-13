@@ -11,10 +11,12 @@ import io from "socket.io-client";
 import { ungzip } from "pako";
 import { RingLoader } from "react-spinners";
 
-import { constants, helpers, module } from "@pcd/ezkl-lib";
+import { constants, helpers, module, artifacts } from "@pcd/ezkl-lib";
+import { getSettings } from "@pcd/ezkl-lib/src/artifacts";
 const { getInit, getVerify } = module;
 const { base64ToUint8ClampedArray } = helpers;
 const { PASSPORT_SERVER_DOMAIN, SET_SERVER_DOMAIN, WASM_PATH } = constants;
+const { getVK, getSRS} = artifacts
 
 // Scan a PCD QR code, then go to /verify to verify and display the proof.
 export function ScanGifScreen() {
@@ -31,6 +33,14 @@ export function ScanGifScreen() {
   const socketRef = useRef(null);
 
   const [verified, setVerified] = useState<boolean | null>(null);
+
+  // set ezkl artifacts on local storage
+  // useEffect(() => {
+
+    
+
+
+  // }, []);
 
   useEffect(() => {
     console.log("PASSPORT_SERVER_DOMAIN from scanner", webSocketUrl);
@@ -67,34 +77,19 @@ export function ScanGifScreen() {
 
   if (scanned) {
     (async () => {
+      console.log('scanned!!!!');
       const verify = await getVerify();
       if (!verify) {
         throw new Error("Failed to import module verify");
       }
 
-      // LOAD VK
-      const vkResp = await fetch(url + "test.vk");
-      if (!vkResp.ok) {
-        throw new Error("Failed to fetch test.vk");
-      }
-      const vkBuf = await vkResp.arrayBuffer();
-      const vk = new Uint8ClampedArray(vkBuf);
+      const srs = await getSRS(url)
+      const vk = await getVK(url);
+      const settings = await getSettings(url);
 
-      // LOAD SETTINGS
-      const settingsResp = await fetch(url + "settings.json");
-      if (!settingsResp.ok) {
-        throw new Error("Failed to fetch settings.json");
-      }
-      const settingsBuf = await settingsResp.arrayBuffer();
-      const settings = new Uint8ClampedArray(settingsBuf);
+      console.log('got all artiofacts')
 
-      // LOAD SRS
-      const srsResp = await fetch(url + "kzg.srs");
-      if (!srsResp.ok) {
-        throw new Error("Failed to fetch kzg.srs");
-      }
-      const srsBuf = await srsResp.arrayBuffer();
-      const srs = new Uint8ClampedArray(srsBuf);
+
 
       const aggScan = scans.join("");
 
