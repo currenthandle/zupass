@@ -38,54 +38,39 @@ export function ScanGifScreen() {
 
   const [verified, setVerified] = useState<boolean | null>(null);
 
-  // set ezkl artifacts on local storage
   useEffect(() => {
     (async function () {
-      // check local for artifacts and timeout if not found
       const now = Date.now();
-      // set timeout to 10 minutes
-      const timeout = 1000 * 60 * 10;
+      const timeout = 1000 * 60 * 10; // 10 minutes
 
-      const vkSetTimeCondition =
-        Number(localStorage.getItem("vkSetTime")) + timeout <= now;
-      const vkCondition = !localStorage.getItem("vk");
-      const srsCondition = !localStorage.getItem("srs");
-      const settingsCondition = !localStorage.getItem("settings");
-      const vkSetTimeExistCondition = !localStorage.getItem("vkSetTime");
-
-      console.log("vkSetTimeCondition:", vkSetTimeCondition);
-      console.log("vkCondition:", vkCondition);
-      console.log("srsCondition:", srsCondition);
-      console.log("settingsCondition:", settingsCondition);
-      console.log("vkSetTimeExistCondition:", vkSetTimeExistCondition);
-
-      console.log("Current time:", now);
-      console.log("Stored vkSetTime:", localStorage.getItem("vkSetTime"));
-      console.log(
-        "Calculated expiry time:",
-        Number(localStorage.getItem("vkSetTime")) + timeout
-      );
-
+      // Check for VK
       if (
-        vkSetTimeCondition ||
-        vkCondition ||
-        srsCondition ||
-        settingsCondition ||
-        vkSetTimeExistCondition
+        Number(localStorage.getItem("vkSetTime")) + timeout <= now ||
+        !localStorage.getItem("vk")
       ) {
-        console.log("============================!!");
-        console.log("============================");
-        console.log("============================");
-        console.log("============================");
-        console.log("refetch");
-        const srs = await getSRS(url);
         const vk = await getVK(url);
-        const settings = await getSettings(url);
-
         localStorage.setItem("vk", clampedArrayToBase64String(vk));
-        localStorage.setItem("srs", clampedArrayToBase64String(srs));
-        localStorage.setItem("settings", clampedArrayToBase64String(settings));
         localStorage.setItem("vkSetTime", Date.now().toString());
+      }
+
+      // Check for SRS
+      if (
+        Number(localStorage.getItem("srsSetTime")) + timeout <= now ||
+        !localStorage.getItem("srs")
+      ) {
+        const srs = await getSRS(url);
+        localStorage.setItem("srs", clampedArrayToBase64String(srs));
+        localStorage.setItem("srsSetTime", Date.now().toString());
+      }
+
+      // Check for Settings
+      if (
+        Number(localStorage.getItem("settingsSetTime")) + timeout <= now ||
+        !localStorage.getItem("settings")
+      ) {
+        const settings = await getSettings(url);
+        localStorage.setItem("settings", clampedArrayToBase64String(settings));
+        localStorage.setItem("settingsSetTime", Date.now().toString());
       }
     })();
   }, [url]);
