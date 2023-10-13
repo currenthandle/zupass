@@ -16,7 +16,7 @@ import { getSettings } from "@pcd/ezkl-lib/src/artifacts";
 const { getInit, getVerify } = module;
 const { base64ToUint8ClampedArray } = helpers;
 const { PASSPORT_SERVER_DOMAIN, SET_SERVER_DOMAIN, WASM_PATH } = constants;
-const { getVK, getSRS} = artifacts
+const { getVK, getSRS } = artifacts;
 
 // Scan a PCD QR code, then go to /verify to verify and display the proof.
 export function ScanGifScreen() {
@@ -36,9 +36,6 @@ export function ScanGifScreen() {
 
   // set ezkl artifacts on local storage
   // useEffect(() => {
-
-    
-
 
   // }, []);
 
@@ -77,19 +74,17 @@ export function ScanGifScreen() {
 
   if (scanned) {
     (async () => {
-      console.log('scanned!!!!');
+      console.log("scanned!!!!");
       const verify = await getVerify();
       if (!verify) {
         throw new Error("Failed to import module verify");
       }
 
-      const srs = await getSRS(url)
+      const srs = await getSRS(url);
       const vk = await getVK(url);
       const settings = await getSettings(url);
 
-      console.log('got all artiofacts')
-
-
+      console.log("got all artiofacts");
 
       const aggScan = scans.join("");
 

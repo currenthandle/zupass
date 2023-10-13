@@ -1,7 +1,7 @@
 async function getFile(url: string, filename: string) {
   const resp = await fetch(url + filename);
   if (!resp.ok) {
-    throw new Error(`Failed to fetch ${filename}`);
+    throw new Error(`Failed to fetch ${url} ${filename}`);
   }
   const buf = await resp.arrayBuffer();
   const arr = new Uint8ClampedArray(buf);
@@ -17,7 +17,7 @@ export async function getPK(url: string) {
 }
 
 export async function getSRS(url: string) {
-  return await getFile(url, "test.srs");
+  return await getFile(url, "kzg.srs");
 }
 
 export async function getSettings(url: string) {
