@@ -171,7 +171,7 @@ export function ScanGifScreen() {
           await attemptVerify();
         } else if (!freshArtifacts.vk) {
           getArtifacts({ vk: true, settings: false });
-          await attemptVerify();
+          await attemptVerify()
         } else if (!freshArtifacts.settings) {
           getArtifacts({ vk: false, settings: true });
           await attemptVerify();

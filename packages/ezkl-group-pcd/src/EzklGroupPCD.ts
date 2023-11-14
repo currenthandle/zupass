@@ -82,8 +82,8 @@ export async function prove(args: EzklGroupPCDArgs): Promise<EzklGroupPCD> {
     throw new Error("Failed to import module genWitness");
   }
 
-  const vk = localStorage.getItem("vk");
-  console.log("vk", vk);
+  // const vk = localStorage.getItem("vk");
+  // console.log("vk", vk);
 
   // FETCH COMPILED MODEL
   const compiliedModelResp = await fetch(url + "network.compiled");
