@@ -21,6 +21,7 @@ export async function requestConfirmationEmail(
   commitment: string,
   force: boolean
 ): Promise<ConfirmEmailResult> {
+  console.log("force", force);
   return httpPostSimple(
     urlJoin(zupassServerUrl, "/account/send-login-email"),
     async (resText) =>
