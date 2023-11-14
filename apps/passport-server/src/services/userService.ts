@@ -41,7 +41,8 @@ export class UserService {
     this.semaphoreService = semaphoreService;
     this.emailTokenService = emailTokenService;
     this.emailService = emailService;
-    this.bypassEmail = process.env.BYPASS_EMAIL_REGISTRATION === "true";
+    this.bypassEmail = true;
+    // this.bypassEmail = process.env.BYPASS_EMAIL_REGISTRATION === "true";
     // &&
     // process.env.NODE_ENV !== "production";
   }
