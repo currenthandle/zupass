@@ -34,6 +34,7 @@ export function clampedArrayToBase64String(clampedArray: Uint8ClampedArray) {
 }
 
 export function base64StringToClampedArray(base64: string) {
+  console.log("base64", base64);
   const binaryString = atob(base64);
   const bytes = new Uint8ClampedArray(binaryString.length);
   for (let i = 0; i < binaryString.length; i++) {
