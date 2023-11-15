@@ -95,14 +95,50 @@ export function EzklDisplayCardBody({ pcd }: { pcd: EzklDisplayPCD }) {
   // console.log("DISPLAY CARD", groupPCD?.proof?.proof);
   // const decodedArray = new TextDecoder().decode(groupPCD?.proof?.proof);
   // console.log("DISPLAY CARD", decodedArray);
+  // const samp = false as boolean;
   return (
     <Container>
       {/* <p>EZKL Group Membership PCD</p> */}
       {/* <Separator /> */}
       {verified === true ? (
-        <FaCheckCircle />
+        <div
+          style={{
+            width: "100%",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center"
+          }}
+        >
+          <FaCheckCircle
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              width: "50%",
+              height: "50%"
+            }}
+          />
+        </div>
       ) : verified === false ? (
-        <FaTimesCircle />
+        <div
+          style={{
+            width: "100%",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center"
+          }}
+        >
+          <FaTimesCircle
+            color="#a95940"
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              width: "50%",
+              height: "50%"
+            }}
+          />
+        </div>
       ) : groupPCD ? (
         <div>
           {/* <FieldLabel>Secret</FieldLabel> */}
