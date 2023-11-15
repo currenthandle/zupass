@@ -222,14 +222,14 @@ export function ScanGifScreen() {
     <AppContainer bg="gray">
       {!scanned ? (
         <>
-          <div style={{ whiteSpace: "normal" }}>
+          {/* <div style={{ whiteSpace: "normal" }}>
             {scans.map((scan, i) => {
               if (scan?.length > 0) {
                 return `${i},`;
               }
               return `*,`;
             })}
-          </div>
+          </div> */}
           <QrReader
             onResult={(result, error) => {
               // console.log("result");
