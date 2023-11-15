@@ -313,7 +313,25 @@ export function ScanGifScreen() {
               </h1>
             </div>
           ) : (
-            <img src="/images/penguin.gif" alt="YOU SHALL NOT PASS!" />
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center"
+              }}
+            >
+              <img src="/images/penguin.gif" alt="YOU SHALL NOT PASS!" />
+
+              <h1
+                style={{
+                  fontWeight: "bold",
+                  fontSize: "3.5rem",
+                  marginTop: "2rem"
+                }}
+              >
+                You're sus...
+              </h1>
+            </div>
           )}
         </div>
       )}
