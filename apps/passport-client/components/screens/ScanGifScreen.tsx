@@ -266,16 +266,16 @@ export function ScanGifScreen() {
             containerStyle={{ width: "100%" }}
           />
           <Spacer h={24} />
-          {/* <TextCenter onClick={reset} onTouchStart={reset}>
+          <TextCenter onClick={reset} onTouchStart={reset}>
             Scan a GIF verify
-          </TextCenter> */}
-          <button
+          </TextCenter>
+          {/* <button
             onClick={reset}
             onTouchStart={reset}
             style={{ background: "none", border: "none" }}
           >
             Scan a GIF verify
-          </button>
+          </button> */}
         </>
       ) : (
         <div style={{ marginTop: "5rem" }}>
@@ -293,7 +293,7 @@ export function ScanGifScreen() {
               }}
             >
               <video src="/videos/cheers.mp4" autoPlay loop />
-              {/* <h1
+              <h1
                 style={{
                   fontWeight: "bold",
                   fontSize: "3.5rem",
@@ -303,8 +303,8 @@ export function ScanGifScreen() {
                 onTouchStart={reset}
               >
                 Welcome!!!
-              </h1> */}
-              <button
+              </h1>
+              {/* <button
                 style={{
                   fontWeight: "bold",
                   fontSize: "3.5rem",
@@ -316,7 +316,7 @@ export function ScanGifScreen() {
                 onTouchStart={reset}
               >
                 Welcome!!!
-              </button>
+              </button> */}
             </div>
           ) : (
             <div
