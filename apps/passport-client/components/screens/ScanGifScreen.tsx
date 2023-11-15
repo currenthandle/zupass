@@ -10,6 +10,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import io from "socket.io-client";
 import { ungzip } from "pako";
 import { RingLoader } from "react-spinners";
+import { Circle } from "rc-progress";
 
 import { constants, helpers, module, artifacts } from "@pcd/ezkl-lib";
 import { getSettings } from "@pcd/ezkl-lib/src/artifacts";
@@ -224,6 +225,15 @@ export function ScanGifScreen() {
       }
     })();
   }
+  // determine the percentage of frames that have been scanned
+  // const percentScanned = Math.floor((scans.length / numFrames) * 100);
+  console.log("scans", scans);
+  // const percentScanned =
+  //   scans.length === 0 ? 0 : Math.floor((scans.length / numFrames) * 100);
+  const countScanned = scans.filter((scan) => scan !== undefined).length;
+  const percentScanned =
+    numFrames === 0 ? 0 : Math.floor((countScanned / numFrames) * 100);
+
   return (
     <AppContainer bg="gray">
       {!scanned ? (
@@ -270,7 +280,7 @@ export function ScanGifScreen() {
               }
             }}
             constraints={{ facingMode: "environment", aspectRatio: 1 }}
-            ViewFinder={ViewFinder}
+            ViewFinder={() => <ViewFinder percentScanned={percentScanned} />}
             containerStyle={{ width: "100%" }}
           />
           <Spacer h={24} />
@@ -304,7 +314,8 @@ export function ScanGifScreen() {
 //   return null;
 // }
 
-function ViewFinder() {
+// function ViewFinder() {
+function ViewFinder({ percentScanned }: { percentScanned: number }) {
   // const nav = useNavigate();
   // const onClose = useCallback(() => nav("/"), [nav]);
   const onClose = () => console.log("onClose");
@@ -315,11 +326,17 @@ function ViewFinder() {
       <CircleButton diameter={20} padding={16} onClick={onClose}>
         <img draggable="false" src={icons.closeWhite} width={20} height={20} />
       </CircleButton>
-      <Guidebox>
+      <Guidebox style={{}}>
         <Corner top left />
         <Corner top />
         <Corner left />
         <Corner />
+        <Circle
+          percent={percentScanned}
+          strokeWidth={4}
+          strokeColor="#19473f"
+          style={{ padding: "60px" }}
+        />
       </Guidebox>
     </ScanOverlayWrap>
   );
