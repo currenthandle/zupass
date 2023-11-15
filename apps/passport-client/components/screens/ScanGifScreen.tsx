@@ -242,7 +242,14 @@ export function ScanGifScreen() {
             containerStyle={{ width: "100%" }}
           />
           <Spacer h={24} />
-          <TextCenter>Scan a GIF verify</TextCenter>
+          <TextCenter
+            onClick={() => {
+              localStorage.removeItem("vk");
+              localStorage.removeItem("settings");
+            }}
+          >
+            Scan a GIF verify
+          </TextCenter>
         </>
       ) : (
         <div style={{ marginTop: "5rem" }}>
