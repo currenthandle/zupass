@@ -80,14 +80,14 @@ export function ScanGifScreen() {
       if (!localStorage.getItem("srs")) {
         const srs = await getSRS(url);
         localStorage.setItem("srs", clampedArrayToBase64String(srs));
-        localStorage.setItem("srsSetTime", Date.now().toString());
+        // localStorage.setItem("srsSetTime", Date.now().toString());
       }
 
       // Check for VK
       if (!localStorage.getItem("vk") || refetch.vk) {
         const vk = await getVK(url);
         localStorage.setItem("vk", clampedArrayToBase64String(vk));
-        localStorage.setItem("vkSetTime", Date.now().toString());
+        // localStorage.setItem("vkSetTime", Date.now().toString());
         setFreshArtifacts((prev) => ({ ...prev, vk: true }));
       }
 
@@ -181,13 +181,14 @@ export function ScanGifScreen() {
         if (verified === true) {
           socketRef.current.emit("verified", true);
         }
-        if (
-          verified === false ||
-          freshArtifacts.vk ||
-          freshArtifacts.settings
-        ) {
-          socketRef.current.emit("verified", false);
-        }
+        // if (
+        //   verified === false ||
+        //   freshArtifacts.vk ||
+        //   freshArtifacts.settings
+        // ) {
+        //   console.log("emits false");
+        //   socketRef.current.emit("verified", false);
+        // }
       }
 
       try {
