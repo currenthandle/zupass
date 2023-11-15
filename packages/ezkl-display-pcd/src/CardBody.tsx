@@ -64,11 +64,18 @@ export function EzklDisplayCardBody({ pcd }: { pcd: EzklDisplayPCD }) {
           <GifQR proof={groupPCD?.proof?.proof} />
         </div>
       ) : (
-        <div className="w-full">
-          <RingLoader
-            color="#000000"
-            className="w-full m-auto flex justify-center"
-          />
+        <div
+          style={{
+            width: "100%",
+            // height: "100%",
+            display: "flex",
+            justifyContent: "center",
+            padding: "16px 0",
+            alignItems: "center"
+            // aspectRatio: "1/1"
+          }}
+        >
+          <RingLoader size={170} color="#19473f" />
         </div>
       )}
     </Container>
