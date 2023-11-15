@@ -55,6 +55,7 @@ export function ScanGifScreen() {
       // Check for SRSk
       if (!localStorage.getItem("srs")) {
         const srs = await getSRS(url);
+        console.log("srs on set", srs);
         localStorage.setItem("srs", clampedArrayToBase64String(srs));
         localStorage.setItem("srsSetTime", Date.now().toString());
         // setFreshArtifacts((prev) => ({ ...prev, srs: true }));
@@ -63,6 +64,7 @@ export function ScanGifScreen() {
       // Check for VK
       if (!localStorage.getItem("vk") || refetch.vk) {
         const vk = await getVK(url);
+        console.log("vk on set", vk);
         localStorage.setItem("vk", clampedArrayToBase64String(vk));
         localStorage.setItem("vkSetTime", Date.now().toString());
         setFreshArtifacts((prev) => ({ ...prev, vk: true }));
@@ -141,6 +143,8 @@ export function ScanGifScreen() {
         WASM_PATH,
         new WebAssembly.Memory({ initial: 20, maximum: 1024, shared: true })
       );
+      console.log("vk on scanned", localStorage.getItem("vk"));
+      console.log("srs on scanned", localStorage.getItem("srs"));
 
       const vk = base64StringToClampedArray(localStorage.getItem("vk"));
       const srs = base64StringToClampedArray(localStorage.getItem("srs"));
@@ -171,7 +175,7 @@ export function ScanGifScreen() {
           await attemptVerify();
         } else if (!freshArtifacts.vk) {
           getArtifacts({ vk: true, settings: false });
-          await attemptVerify()
+          await attemptVerify();
         } else if (!freshArtifacts.settings) {
           getArtifacts({ vk: false, settings: true });
           await attemptVerify();
