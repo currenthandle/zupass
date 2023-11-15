@@ -266,9 +266,12 @@ export function ScanGifScreen() {
             containerStyle={{ width: "100%" }}
           />
           <Spacer h={24} />
-          <TextCenter onClick={reset} onTouchStart={reset}>
+          {/* <TextCenter onClick={reset} onTouchStart={reset}>
             Scan a GIF verify
-          </TextCenter>
+          </TextCenter> */}
+          <button onClick={reset} onTouchStart={reset}>
+            Scan a GIF verify
+          </button>
         </>
       ) : (
         <div style={{ marginTop: "5rem" }}>
@@ -319,7 +322,7 @@ export function ScanGifScreen() {
             >
               <img src="/images/penguin.gif" alt="YOU SHALL NOT PASS!" />
 
-              <button
+              <h1
                 style={{
                   fontWeight: "bold",
                   fontSize: "3.5rem",
@@ -327,16 +330,7 @@ export function ScanGifScreen() {
                 }}
               >
                 You're sus...
-              </button>
-              {/* <h1
-                style={{
-                  fontWeight: "bold",
-                  fontSize: "3.5rem",
-                  marginTop: "2rem"
-                }}
-              >
-                You're sus...
-              </h1> */}
+              </h1>
             </div>
           )}
         </div>
