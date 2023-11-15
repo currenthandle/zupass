@@ -286,7 +286,7 @@ export function ScanGifScreen() {
               }}
             >
               <video src="/videos/cheers.mp4" autoPlay loop />
-              <h1
+              {/* <h1
                 style={{
                   fontWeight: "bold",
                   fontSize: "3.5rem",
@@ -296,7 +296,18 @@ export function ScanGifScreen() {
                 onTouchStart={reset}
               >
                 Welcome!!!
-              </h1>
+              </h1> */}
+              <button
+                style={{
+                  fontWeight: "bold",
+                  fontSize: "3.5rem",
+                  marginTop: "2rem"
+                }}
+                onClick={reset}
+                onTouchStart={reset}
+              >
+                Welcome!!!
+              </button>
             </div>
           ) : (
             <div
@@ -308,7 +319,7 @@ export function ScanGifScreen() {
             >
               <img src="/images/penguin.gif" alt="YOU SHALL NOT PASS!" />
 
-              <h1
+              <button
                 style={{
                   fontWeight: "bold",
                   fontSize: "3.5rem",
@@ -316,7 +327,16 @@ export function ScanGifScreen() {
                 }}
               >
                 You're sus...
-              </h1>
+              </button>
+              {/* <h1
+                style={{
+                  fontWeight: "bold",
+                  fontSize: "3.5rem",
+                  marginTop: "2rem"
+                }}
+              >
+                You're sus...
+              </h1> */}
             </div>
           )}
         </div>
