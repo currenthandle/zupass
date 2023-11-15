@@ -269,7 +269,11 @@ export function ScanGifScreen() {
           {/* <TextCenter onClick={reset} onTouchStart={reset}>
             Scan a GIF verify
           </TextCenter> */}
-          <button onClick={reset} onTouchStart={reset}>
+          <button
+            onClick={reset}
+            onTouchStart={reset}
+            style={{ background: "none", border: "none" }}
+          >
             Scan a GIF verify
           </button>
         </>
@@ -304,7 +308,9 @@ export function ScanGifScreen() {
                 style={{
                   fontWeight: "bold",
                   fontSize: "3.5rem",
-                  marginTop: "2rem"
+                  marginTop: "2rem",
+                  background: "none",
+                  border: "none"
                 }}
                 onClick={reset}
                 onTouchStart={reset}
