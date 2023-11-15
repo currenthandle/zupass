@@ -313,7 +313,7 @@ export function ScanGifScreen() {
               </h1>
             </div>
           ) : (
-            <div>Not verified</div>
+            <img src="/images/penguin.gif" alt="YOU SHALL NOT PASS!" />
           )}
         </div>
       )}
