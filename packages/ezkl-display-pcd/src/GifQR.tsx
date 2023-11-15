@@ -12,6 +12,7 @@ const { CHUNK_SIZE, FRAME_RATE, PASSPORT_SERVER_DOMAIN } = constants;
 export default function GifQR({ proof }: { proof: Uint8Array }) {
   const socketRef = useRef<Socket | null>(null);
   const [skipChunks, setSkipChunks] = useState<Record<number, true>>({});
+  const [verified, setVerified] = useState<boolean | null>(null);
   useEffect(() => {
     socketRef.current = io(PASSPORT_SERVER_DOMAIN + "/gifscan");
 
@@ -22,6 +23,11 @@ export default function GifQR({ proof }: { proof: Uint8Array }) {
     socketRef.current.on("broadcastedQrId", (id) => {
       console.log("broadcastedQrId", id);
       setSkipChunks((prev) => ({ ...prev, [id]: true }));
+    });
+
+    socketRef.current.on("broadcastedVerified", (verfied) => {
+      console.log("broadcastedVerified", verfied);
+      setVerified(verfied);
     });
 
     socketRef.current.on("connect_error", (error) => {

@@ -2,7 +2,7 @@ import {
   encodeQRPayload,
   QRDisplayWithRegenerateAndStorage
 } from "@pcd/passport-ui";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { FieldLabel, Separator, Spacer, TextContainer } from "@pcd/passport-ui";
 import styled from "styled-components";
 import {
@@ -15,12 +15,48 @@ import { EzklGroupPCD, EzklGroupPCDPackage } from "@pcd/ezkl-group-pcd";
 import { ArgumentTypeName } from "@pcd/pcd-types";
 import GifQR from "./GifQR";
 import { RingLoader } from "react-spinners";
+import { PASSPORT_SERVER_DOMAIN } from "@pcd/ezkl-lib/src/constants";
+import { io } from "socket.io-client";
+import { Socket } from "socket.io-client";
 
 export function EzklDisplayCardBody({ pcd }: { pcd: EzklDisplayPCD }) {
-  // const ticketData = getTicketData(pcd);: dataStr
-  // console.log("DISPLAY CARD", pcd);
-
   const [groupPCD, setGroupPCD] = useState<EzklGroupPCD | null>(null);
+
+  // const [skipChunks, setSkipChunks] = useState<Record<number, true>>({});
+  const socketRef = useRef<Socket | null>(null);
+  const [verified, setVerified] = useState<boolean | null>(null);
+  useEffect(() => {
+    socketRef.current = io(PASSPORT_SERVER_DOMAIN + "/gifscan");
+
+    socketRef.current.on("connect", () => {
+      console.log("[SOCKET] Connected to server");
+    });
+
+    // socketRef.current.on("broadcastedQrId", (id) => {
+    //   console.log("broadcastedQrId", id);
+    //   setSkipChunks((prev) => ({ ...prev, [id]: true }));
+    // });
+
+    socketRef.current.on("broadcastedVerified", (verfied) => {
+      console.log("broadcastedVerified", verfied);
+      setVerified(verfied);
+    });
+
+    socketRef.current.on("connect_error", (error) => {
+      console.error("[SOCKET] Connection error:", error);
+    });
+
+    socketRef.current.on("disconnect", (reason) => {
+      console.log("[SOCKET] Disconnected from server. Reason:", reason);
+    });
+
+    // Clean up on component unmount
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+      }
+    };
+  }, []);
 
   useEffect(() => {
     const callProve = async () => {
@@ -58,7 +94,11 @@ export function EzklDisplayCardBody({ pcd }: { pcd: EzklDisplayPCD }) {
     <Container>
       {/* <p>EZKL Group Membership PCD</p> */}
       {/* <Separator /> */}
-      {groupPCD ? (
+      {verified === true ? (
+        <div>v</div>
+      ) : verified === false ? (
+        <div>nv</div>
+      ) : groupPCD ? (
         <div>
           {/* <FieldLabel>Secret</FieldLabel> */}
           <GifQR proof={groupPCD?.proof?.proof} />

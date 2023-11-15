@@ -29,6 +29,12 @@ export function initGifScanRoutes(
 
       socket.broadcast.emit("broadcastedQrId", id);
     });
+
+    socket.on("verified", (verified) => {
+      logger("[SOCKET] verified received", verified);
+
+      socket.broadcast.emit("broadcastedVerified", verified);
+    });
     socket.on("disconnect", () => {
       logger("[SOCKET] user disconnected");
     });

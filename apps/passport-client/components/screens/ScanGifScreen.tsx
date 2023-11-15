@@ -55,7 +55,7 @@ export function ScanGifScreen() {
       // Check for SRSk
       if (!localStorage.getItem("srs")) {
         const srs = await getSRS(url);
-        console.log("srs on set", srs);
+        // console.log("srs on set", srs);
         localStorage.setItem("srs", clampedArrayToBase64String(srs));
         localStorage.setItem("srsSetTime", Date.now().toString());
         // setFreshArtifacts((prev) => ({ ...prev, srs: true }));
@@ -64,7 +64,7 @@ export function ScanGifScreen() {
       // Check for VK
       if (!localStorage.getItem("vk") || refetch.vk) {
         const vk = await getVK(url);
-        console.log("vk on set", vk);
+        // console.log("vk on set", vk);
         localStorage.setItem("vk", clampedArrayToBase64String(vk));
         localStorage.setItem("vkSetTime", Date.now().toString());
         setFreshArtifacts((prev) => ({ ...prev, vk: true }));
@@ -109,6 +109,27 @@ export function ScanGifScreen() {
     };
   }, [webSocketUrl]);
 
+  // useEffect(() => {
+  //   console.log("======================");
+  //   console.log("======================");
+  //   console.log("======================");
+  //   console.log("======================");
+  //   console.log("verified", verified);
+  //   console.log("scanned", scanned);
+  //   console.log("freshArtifacts", freshArtifacts);
+  //   // if (verified === null) {
+  //   //   return;
+  //   // }
+  //   if (freshArtifacts.vk && freshArtifacts.settings) {
+  //     if (verified === true) {
+  //       socketRef.current.emit("verified", true);
+  //     }
+  //     if (verified === false) {
+  //       socketRef.current.emit("verified", false);
+  //     }
+  //   }
+  // }, [verified, scanned, freshArtifacts]);
+
   useEffect(() => {
     if (numFrames > 0 && numFrames === scans.length) {
       for (let i = 0; i < numFrames; i++) {
@@ -127,7 +148,7 @@ export function ScanGifScreen() {
         throw new Error("Failed to import module verify");
       }
 
-      console.log("got all artiofacts");
+      // console.log("got all artiofacts");
 
       const aggScan = scans.join("");
 
@@ -143,8 +164,8 @@ export function ScanGifScreen() {
         WASM_PATH,
         new WebAssembly.Memory({ initial: 20, maximum: 1024, shared: true })
       );
-      console.log("vk on scanned", localStorage.getItem("vk"));
-      console.log("srs on scanned", localStorage.getItem("srs"));
+      // console.log("vk on scanned", localStorage.getItem("vk"));
+      // console.log("srs on scanned", localStorage.getItem("srs"));
 
       const vk = base64StringToClampedArray(localStorage.getItem("vk"));
       const srs = base64StringToClampedArray(localStorage.getItem("srs"));
@@ -160,16 +181,32 @@ export function ScanGifScreen() {
           srs
         );
         setVerified(verified);
+
+        console.log("before socket emit");
+        console.log("freshArtifacts", freshArtifacts);
+        console.log("verified", verified);
+        if (verified === true) {
+          console.log('emit "verified" true');
+          socketRef.current.emit("verified", true);
+        }
+        if (
+          verified === false ||
+          freshArtifacts.vk ||
+          freshArtifacts.settings
+        ) {
+          console.log('emit "verified" false');
+          socketRef.current.emit("verified", false);
+        }
       }
 
       try {
         await attemptVerify();
       } catch (err) {
-        if (!freshArtifacts.vk || !freshArtifacts.settings) {
-          console.log("not fresh");
-        } else {
-          console.log("fresh");
-        }
+        // if (!freshArtifacts.vk || !freshArtifacts.settings) {
+        //   console.log("not fresh");
+        // } else {
+        //   console.log("fresh");
+        // }
         if (!freshArtifacts.vk && !freshArtifacts.settings) {
           getArtifacts({ vk: true, settings: true });
           await attemptVerify();
@@ -180,6 +217,8 @@ export function ScanGifScreen() {
           getArtifacts({ vk: false, settings: true });
           await attemptVerify();
         } else {
+          console.log('emit "verified" false');
+          socketRef.current.emit("verified", false);
           setVerified(false);
         }
       }
@@ -222,13 +261,6 @@ export function ScanGifScreen() {
               }
 
               if (scans[id] === undefined) {
-                // console.log("");
-                // console.log("scans[id]", scans[id]);
-                // console.log("setScans", id);
-                // const newScans = [...scans];
-                // newScans[id] = chunkData.slice(6);
-                // console.log("newScans", newScans);
-                // setScans(newScans);
                 setScans((prevScans) => {
                   const newScans = [...prevScans];
                   newScans[id] = chunkData;
