@@ -266,7 +266,9 @@ export function ScanGifScreen() {
             containerStyle={{ width: "100%" }}
           />
           <Spacer h={24} />
-          <TextCenter onClick={reset}>Scan a GIF verify</TextCenter>
+          <TextCenter onClick={reset} onTouchStart={reset}>
+            Scan a GIF verify
+          </TextCenter>
         </>
       ) : (
         <div style={{ marginTop: "5rem" }}>
@@ -291,6 +293,7 @@ export function ScanGifScreen() {
                   marginTop: "2rem"
                 }}
                 onClick={reset}
+                onTouchStart={reset}
               >
                 Welcome!!!
               </h1>
