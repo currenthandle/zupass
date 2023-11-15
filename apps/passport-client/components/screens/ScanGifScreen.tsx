@@ -25,6 +25,29 @@ const { getVK, getSRS } = artifacts;
 
 // Scan a PCD QR code, then go to /verify to verify and display the proof.
 export function ScanGifScreen() {
+  const reset = useCallback(async () => {
+    localStorage.removeItem("vk");
+    localStorage.removeItem("settings");
+
+    try {
+      console.log("SET_SERVER_DOMAIN", SET_SERVER_DOMAIN);
+      const resp = await fetch(`${SET_SERVER_DOMAIN}/reset`, {
+        method: "POST"
+      });
+
+      if (resp.ok) {
+        // If the response is successful, refresh the page
+        window.location.reload();
+      } else {
+        // Handle non-successful responses here
+        console.error("Failed to reset:", await resp.text());
+      }
+    } catch (error) {
+      // Handle network errors or other exceptions here
+      console.error("Error while resetting:", error);
+    }
+  }, []);
+
   // const HOST = "http://localhost:5001";
   const HOST = SET_SERVER_DOMAIN;
   const ROUTE = "/public";
@@ -208,9 +231,9 @@ export function ScanGifScreen() {
           </div>
           <QrReader
             onResult={(result, error) => {
-              console.log("result");
+              // console.log("result");
               if (error) {
-                console.error("error", error);
+                // console.error("error", error);
                 return;
               }
               if (!result) {
@@ -242,14 +265,7 @@ export function ScanGifScreen() {
             containerStyle={{ width: "100%" }}
           />
           <Spacer h={24} />
-          <TextCenter
-            onClick={() => {
-              localStorage.removeItem("vk");
-              localStorage.removeItem("settings");
-            }}
-          >
-            Scan a GIF verify
-          </TextCenter>
+          <TextCenter onClick={reset}>Scan a GIF verify</TextCenter>
         </>
       ) : (
         <div style={{ marginTop: "5rem" }}>
@@ -273,6 +289,7 @@ export function ScanGifScreen() {
                   fontSize: "3.5rem",
                   marginTop: "2rem"
                 }}
+                onClick={reset}
               >
                 Welcome!!!
               </h1>
