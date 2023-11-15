@@ -294,7 +294,24 @@ export function ScanGifScreen() {
               className="w-full m-auto flex justify-center"
             />
           ) : verified ? (
-            <video src="/videos/cheers.mp4" autoPlay loop />
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center"
+              }}
+            >
+              <video src="/videos/cheers.mp4" autoPlay loop />
+              <h1
+                style={{
+                  fontWeight: "bold",
+                  fontSize: "3.5rem",
+                  marginTop: "2rem"
+                }}
+              >
+                Welcome!!!
+              </h1>
+            </div>
           ) : (
             <div>Not verified</div>
           )}
