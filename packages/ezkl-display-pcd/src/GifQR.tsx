@@ -6,13 +6,17 @@ import io from "socket.io-client";
 import { gzip, ungzip } from "pako";
 import "setimmediate";
 
-import { constants } from "@pcd/ezkl-lib";
+// import { constants } from "@pcd/ezkl-lib";
+import * as ezklLib from "@pcd/ezkl-lib";
+console.log("ezklLib", ezklLib);
+const { constants } = ezklLib;
+console.log("constants", constants);
 const { CHUNK_SIZE, FRAME_RATE, PASSPORT_SERVER_DOMAIN } = constants;
 
 export default function GifQR({ proof }: { proof: Uint8Array }) {
   const socketRef = useRef<Socket | null>(null);
   const [skipChunks, setSkipChunks] = useState<Record<number, true>>({});
-  const [verified, setVerified] = useState<boolean | null>(null);
+  // const [verified, setVerified] = useState<boolean | null>(null);
   useEffect(() => {
     socketRef.current = io(PASSPORT_SERVER_DOMAIN + "/gifscan");
 
@@ -25,10 +29,10 @@ export default function GifQR({ proof }: { proof: Uint8Array }) {
       setSkipChunks((prev) => ({ ...prev, [id]: true }));
     });
 
-    socketRef.current.on("broadcastedVerified", (verfied) => {
-      console.log("broadcastedVerified", verfied);
-      setVerified(verfied);
-    });
+    // socketRef.current.on("broadcastedVerified", (verfied) => {
+    //   console.log("broadcastedVerified", verfied);
+    //   setVerified(verfied);
+    // });
 
     socketRef.current.on("connect_error", (error) => {
       console.error("[SOCKET] Connection error:", error);

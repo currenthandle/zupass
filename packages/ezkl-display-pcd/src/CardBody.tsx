@@ -15,9 +15,14 @@ import { EzklGroupPCD, EzklGroupPCDPackage } from "@pcd/ezkl-group-pcd";
 import { ArgumentTypeName } from "@pcd/pcd-types";
 import GifQR from "./GifQR";
 import { RingLoader } from "react-spinners";
-import { PASSPORT_SERVER_DOMAIN } from "@pcd/ezkl-lib/src/constants";
+// import { PASSPORT_SERVER_DOMAIN } from "@pcd/ezkl-lib/src/constants";
 import { io } from "socket.io-client";
 import { Socket } from "socket.io-client";
+import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
+
+import * as ezklLib from "@pcd/ezkl-lib";
+const { constants } = ezklLib;
+const { PASSPORT_SERVER_DOMAIN } = constants;
 
 export function EzklDisplayCardBody({ pcd }: { pcd: EzklDisplayPCD }) {
   const [groupPCD, setGroupPCD] = useState<EzklGroupPCD | null>(null);
@@ -95,9 +100,9 @@ export function EzklDisplayCardBody({ pcd }: { pcd: EzklDisplayPCD }) {
       {/* <p>EZKL Group Membership PCD</p> */}
       {/* <Separator /> */}
       {verified === true ? (
-        <div>v</div>
+        <FaCheckCircle />
       ) : verified === false ? (
-        <div>nv</div>
+        <FaTimesCircle />
       ) : groupPCD ? (
         <div>
           {/* <FieldLabel>Secret</FieldLabel> */}
