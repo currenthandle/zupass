@@ -56,16 +56,13 @@ export function ScanGifScreen() {
       // Check for SRSk
       if (!localStorage.getItem("srs")) {
         const srs = await getSRS(url);
-        // console.log("srs on set", srs);
         localStorage.setItem("srs", clampedArrayToBase64String(srs));
         localStorage.setItem("srsSetTime", Date.now().toString());
-        // setFreshArtifacts((prev) => ({ ...prev, srs: true }));
       }
 
       // Check for VK
       if (!localStorage.getItem("vk") || refetch.vk) {
         const vk = await getVK(url);
-        // console.log("vk on set", vk);
         localStorage.setItem("vk", clampedArrayToBase64String(vk));
         localStorage.setItem("vkSetTime", Date.now().toString());
         setFreshArtifacts((prev) => ({ ...prev, vk: true }));
@@ -110,27 +107,6 @@ export function ScanGifScreen() {
     };
   }, [webSocketUrl]);
 
-  // useEffect(() => {
-  //   console.log("======================");
-  //   console.log("======================");
-  //   console.log("======================");
-  //   console.log("======================");
-  //   console.log("verified", verified);
-  //   console.log("scanned", scanned);
-  //   console.log("freshArtifacts", freshArtifacts);
-  //   // if (verified === null) {
-  //   //   return;
-  //   // }
-  //   if (freshArtifacts.vk && freshArtifacts.settings) {
-  //     if (verified === true) {
-  //       socketRef.current.emit("verified", true);
-  //     }
-  //     if (verified === false) {
-  //       socketRef.current.emit("verified", false);
-  //     }
-  //   }
-  // }, [verified, scanned, freshArtifacts]);
-
   useEffect(() => {
     if (numFrames > 0 && numFrames === scans.length) {
       for (let i = 0; i < numFrames; i++) {
@@ -149,8 +125,6 @@ export function ScanGifScreen() {
         throw new Error("Failed to import module verify");
       }
 
-      // console.log("got all artiofacts");
-
       const aggScan = scans.join("");
 
       const decodedProof = base64ToUint8ClampedArray(aggScan);
@@ -165,8 +139,6 @@ export function ScanGifScreen() {
         WASM_PATH,
         new WebAssembly.Memory({ initial: 20, maximum: 1024, shared: true })
       );
-      // console.log("vk on scanned", localStorage.getItem("vk"));
-      // console.log("srs on scanned", localStorage.getItem("srs"));
 
       const vk = base64StringToClampedArray(localStorage.getItem("vk"));
       const srs = base64StringToClampedArray(localStorage.getItem("srs"));
@@ -183,11 +155,7 @@ export function ScanGifScreen() {
         );
         setVerified(verified);
 
-        console.log("before socket emit");
-        console.log("freshArtifacts", freshArtifacts);
-        console.log("verified", verified);
         if (verified === true) {
-          console.log('emit "verified" true');
           socketRef.current.emit("verified", true);
         }
         if (
@@ -195,7 +163,6 @@ export function ScanGifScreen() {
           freshArtifacts.vk ||
           freshArtifacts.settings
         ) {
-          console.log('emit "verified" false');
           socketRef.current.emit("verified", false);
         }
       }
@@ -203,11 +170,6 @@ export function ScanGifScreen() {
       try {
         await attemptVerify();
       } catch (err) {
-        // if (!freshArtifacts.vk || !freshArtifacts.settings) {
-        //   console.log("not fresh");
-        // } else {
-        //   console.log("fresh");
-        // }
         if (!freshArtifacts.vk && !freshArtifacts.settings) {
           getArtifacts({ vk: true, settings: true });
           await attemptVerify();
@@ -218,7 +180,6 @@ export function ScanGifScreen() {
           getArtifacts({ vk: false, settings: true });
           await attemptVerify();
         } else {
-          console.log('emit "verified" false');
           socketRef.current.emit("verified", false);
           setVerified(false);
         }
@@ -227,7 +188,6 @@ export function ScanGifScreen() {
   }
   // determine the percentage of frames that have been scanned
   // const percentScanned = Math.floor((scans.length / numFrames) * 100);
-  console.log("scans", scans);
   // const percentScanned =
   //   scans.length === 0 ? 0 : Math.floor((scans.length / numFrames) * 100);
   const countScanned = scans.filter((scan) => scan !== undefined).length;
@@ -248,9 +208,9 @@ export function ScanGifScreen() {
           </div>
           <QrReader
             onResult={(result, error) => {
-              // console.log("result");
+              console.log("result");
               if (error) {
-                // console.error("error", error);
+                console.error("error", error);
                 return;
               }
               if (!result) {
@@ -261,12 +221,10 @@ export function ScanGifScreen() {
               const id = parseInt(data.substring(0, 3), 10);
               const totalFrames = parseInt(data.substring(3, 6), 10);
               const chunkData = data.substring(6);
-              // console.log("data", data);
 
               socketRef.current.emit("qrId", id);
 
               if (numFrames === 0) {
-                // console.log("setNumFrames", length);
                 setNumFrames(totalFrames);
               }
 
