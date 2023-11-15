@@ -294,7 +294,7 @@ export function ScanGifScreen() {
               className="w-full m-auto flex justify-center"
             />
           ) : verified ? (
-            <div>Verified</div>
+            <video src="/videos/cheers.mp4" autoPlay loop />
           ) : (
             <div>Not verified</div>
           )}
