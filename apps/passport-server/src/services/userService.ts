@@ -102,7 +102,9 @@ export class UserService {
       // so we will need to verify email ownership with code.
       !existingCommitment.encryption_key
     ) {
-      throw new PCDHTTPError(403, `'${email}' already registered`);
+      res.status(403).send(`'${email}' already registered`);
+      return
+      // throw new PCDHTTPError(403, `'${email}' already registered`);
     }
 
     logger(
