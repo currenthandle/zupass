@@ -396,7 +396,8 @@ function ViewFinder({ percentScanned }: { percentScanned: number }) {
         <Corner />
         <Circle
           percent={percentScanned}
-          strokeWidth={4}
+          strokeWidth={5.3}
+          trailWidth={1.3}
           strokeColor="#19473f"
           style={{ padding: "60px" }}
         />
