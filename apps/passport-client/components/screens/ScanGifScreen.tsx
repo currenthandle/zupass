@@ -25,6 +25,28 @@ const { getVK, getSRS } = artifacts;
 
 // Scan a PCD QR code, then go to /verify to verify and display the proof.
 export function ScanGifScreen() {
+
+  const [preloadedGif, setPreloadedGif] = useState(null);
+  const [preloadedVideo, setPreloadedVideo] = useState(null);
+
+  useEffect(() => {
+    // Preload GIF
+    const gif = new Image();
+    gif.src = "/images/penguin.gif";
+    gif.onload = () => setPreloadedGif(gif);
+
+    // Preload Video
+    const video = document.createElement("video");
+    video.src = "/videos/cheers.mp4";
+    video.onloadeddata = () => setPreloadedVideo(video);
+
+    // Cleanup
+    return () => {
+      gif.onload = null;
+      video.onloadeddata = null;
+    };
+  }, []);
+
   const reset = useCallback(async () => {
     localStorage.removeItem("vk");
     localStorage.removeItem("settings");
@@ -292,7 +314,7 @@ export function ScanGifScreen() {
                 alignItems: "center"
               }}
             >
-              <video src="/videos/cheers.mp4" autoPlay loop />
+              <video src={preloadedVideo.src} autoPlay loop />
               <h1
                 style={{
                   fontWeight: "bold",
@@ -326,7 +348,7 @@ export function ScanGifScreen() {
                 alignItems: "center"
               }}
             >
-              <img src="/images/penguin.gif" alt="YOU SHALL NOT PASS!" />
+              <img src={preloadedGif.src} alt="YOU SHALL NOT PASS!" />
 
               <h1
                 style={{
